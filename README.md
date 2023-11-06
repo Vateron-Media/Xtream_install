@@ -1,15 +1,18 @@
-**XtreamUI CK41 MOD Reborn by Apocalypse DRMStuff.com**
+# Xtreamui 22F
 
-How do I install?
+## Moded
+- Admin panel modified by NeySlim
+- Server decryption and Divarion-D error fixes
 
-update your ubuntu first, then install panel
+## How do I install?
+Currently supports linux 20
 
+Update your ubuntu first, then install panel
 
-sudo apt update && sudo apt full-upgrade -y && sudo apt install python2 -y;
+```sudo apt update && sudo apt full-upgrade -y && sudo apt install python2 -y;```
 
-rm install.py; wget https://raw.githubusercontent.com/Vateron-Media/Xtream_install/main/install.py;
+```rm install.py; wget https://raw.githubusercontent.com/Vateron-Media/Xtream_install/main/install.py;```
 
-sudo python2 install.py 
+```sudo python2 install.py```
 
-If you want a whole NEW installation, choose MAIN.
 

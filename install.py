@@ -5,7 +5,10 @@ from itertools import cycle, izip
 from zipfile import ZipFile
 from urllib2 import Request, urlopen, URLError, HTTPError
 
-rDownloadURL = {"main": "https://github.com/Vateron-Media/Xtream_Update/releases/download/update/main_xui.tar.gz", "sub": "https://github.com/Vateron-Media/Xtream_Update/releases/download/update/sub_xui.tar.gz"}
+Version_main = "v1.1.8"
+Version_sub = "v1.0.0"
+
+rDownloadURL = {"main": "https://github.com/Vateron-Media/Xtream_main/releases/download/%s/main_xui.tar.gz" % Version_main, "sub": "https://github.com/Vateron-Media/Xtream_sub/releases/download/%s/sub_xui.tar.gz" % Version_sub}
 rPackages = ["libcurl4", "libxslt1-dev", "libgeoip-dev", "e2fsprogs", "wget", "mcrypt", "nscd", "htop", "zip", "unzip", "mc", "libpng16-16", "libzip5", "python-is-python2", "mariadb-server"]
 rInstall = {"MAIN": "main", "LB": "sub"}
 rUpdate = {"UPDATE": "update"}

@@ -13,6 +13,6 @@ Update your ubuntu first, then install panel
 
 ```rm install.py; wget https://raw.githubusercontent.com/Vateron-Media/Xtream_install/main/install3.py;```
 
-```sudo python3 install.py```
+```sudo python3 install3.py```
 
 

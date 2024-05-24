@@ -14,7 +14,7 @@ import urllib.request
 from itertools import cycle
 from zipfile import ZipFile
 
-Version_main = "v1.1.8"
+Version_main = "v1.1.9"
 Version_sub = "v1.0.0"
 
 rDownloadURL = {

@@ -5,7 +5,7 @@ from itertools import cycle, izip
 from zipfile import ZipFile
 from urllib2 import Request, urlopen, URLError, HTTPError
 
-Version_main = "v1.1.8"
+Version_main = "v1.1.10"
 Version_sub = "v1.0.0"
 
 rDownloadURL = {"main": "https://github.com/Vateron-Media/Xtream_main/releases/download/%s/main_xui.tar.gz" % Version_main, "sub": "https://github.com/Vateron-Media/Xtream_sub/releases/download/%s/sub_xui.tar.gz" % Version_sub}

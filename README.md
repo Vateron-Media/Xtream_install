@@ -20,9 +20,9 @@ Update your ubuntu first, then install panel
 
 ```sudo apt update && sudo apt full-upgrade -y && sudo apt install python2 -y;```
 
-```rm install3.py; wget https://raw.githubusercontent.com/Vateron-Media/Xtream_install/main/install3.py;```
+```rm install.py; wget https://raw.githubusercontent.com/Vateron-Media/Xtream_install/main/install.py;```
 
-```sudo python3 install3.py```
+```sudo python3 install.py```
 
 # Disclaimer
 **This project has been created for educational purposes.**

@@ -11,7 +11,7 @@ Decoded Xtream panel. Based on the release from NeySlim 22F.
 ## Repositories 
 [MAIN](https://github.com/Vateron-Media/Xtream_main) - XtreamUI Panel
 
-[SUB](https://github.com/Vateron-Media/Xtream_sub) - Balancer
+[SUB](https://github.com/Vateron-Media/Xtream_sub) - Balancer is not working
 
 ## How do I install?
 Currently supports linux 20

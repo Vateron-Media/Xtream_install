@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import json
 import os
@@ -8,13 +8,10 @@ import socket
 import string
 import subprocess
 import sys
-import urllib
 import base64
-import urllib.request
 from itertools import cycle
-from zipfile import ZipFile
 
-Version_main = "v1.1.11"
+Version_main = "v1.2.0"
 Version_sub = "v1.0.0"
 
 rDownloadURL = {
@@ -41,10 +38,10 @@ rPackages = [
     "mariadb-server",
 ]
 rInstall = {"MAIN": "main", "LB": "sub"}
-rUpdate = {"UPDATE": "update"}
 rMySQLCnf = base64.b64decode(
     "IyBYdHJlYW0gQ29kZXMKCltjbGllbnRdCnBvcnQgICAgICAgICAgICA9IDMzMDYKCltteXNxbGRfc2FmZV0KbmljZSAgICAgICAgICAgID0gMAoKW215c3FsZF0KdXNlciAgICAgICAgICAgID0gbXlzcWwKcG9ydCAgICAgICAgICAgID0gNzk5OQpiYXNlZGlyICAgICAgICAgPSAvdXNyCmRhdGFkaXIgICAgICAgICA9IC92YXIvbGliL215c3FsCnRtcGRpciAgICAgICAgICA9IC90bXAKbGMtbWVzc2FnZXMtZGlyID0gL3Vzci9zaGFyZS9teXNxbApza2lwLWV4dGVybmFsLWxvY2tpbmcKc2tpcC1uYW1lLXJlc29sdmU9MQoKYmluZC1hZGRyZXNzICAgICAgICAgICAgPSAqCmtleV9idWZmZXJfc2l6ZSA9IDEyOE0KCm15aXNhbV9zb3J0X2J1ZmZlcl9zaXplID0gNE0KbWF4X2FsbG93ZWRfcGFja2V0ICAgICAgPSA2NE0KbXlpc2FtLXJlY292ZXItb3B0aW9ucyA9IEJBQ0tVUAptYXhfbGVuZ3RoX2Zvcl9zb3J0X2RhdGEgPSA4MTkyCnF1ZXJ5X2NhY2hlX2xpbWl0ICAgICAgID0gNE0KcXVlcnlfY2FjaGVfc2l6ZSAgICAgICAgPSAwCnF1ZXJ5X2NhY2hlX3R5cGUJPSAwCgpleHBpcmVfbG9nc19kYXlzICAgICAgICA9IDEwCm1heF9iaW5sb2dfc2l6ZSAgICAgICAgID0gMTAwTQoKbWF4X2Nvbm5lY3Rpb25zICA9IDIwMDAgI3JlY29tbWVuZGVkIGZvciAxNkdCIHJhbSAKYmFja19sb2cgPSA0MDk2Cm9wZW5fZmlsZXNfbGltaXQgPSAxNjM4NAppbm5vZGJfb3Blbl9maWxlcyA9IDE2Mzg0Cm1heF9jb25uZWN0X2Vycm9ycyA9IDMwNzIKdGFibGVfb3Blbl9jYWNoZSA9IDQwOTYKdGFibGVfZGVmaW5pdGlvbl9jYWNoZSA9IDQwOTYKCgp0bXBfdGFibGVfc2l6ZSA9IDFHCm1heF9oZWFwX3RhYmxlX3NpemUgPSAxRwoKaW5ub2RiX2J1ZmZlcl9wb29sX3NpemUgPSAxMkcgI3JlY29tbWVuZGVkIGZvciAxNkdCIHJhbQppbm5vZGJfYnVmZmVyX3Bvb2xfaW5zdGFuY2VzID0gMQppbm5vZGJfcmVhZF9pb190aHJlYWRzID0gNjQKaW5ub2RiX3dyaXRlX2lvX3RocmVhZHMgPSA2NAppbm5vZGJfdGhyZWFkX2NvbmN1cnJlbmN5ID0gMAppbm5vZGJfZmx1c2hfbG9nX2F0X3RyeF9jb21taXQgPSAwCmlubm9kYl9mbHVzaF9tZXRob2QgPSBPX0RJUkVDVApwZXJmb3JtYW5jZV9zY2hlbWEgPSBPTgppbm5vZGItZmlsZS1wZXItdGFibGUgPSAxCmlubm9kYl9pb19jYXBhY2l0eT0yMDAwMAppbm5vZGJfdGFibGVfbG9ja3MgPSAwCmlubm9kYl9sb2NrX3dhaXRfdGltZW91dCA9IDAKaW5ub2RiX2RlYWRsb2NrX2RldGVjdCA9IDAKaW5ub2RiX2xvZ19maWxlX3NpemUgPSA1MTJNCgpzcWwtbW9kZT0iTk9fRU5HSU5FX1NVQlNUSVRVVElPTiIKCltteXNxbGR1bXBdCnF1aWNrCnF1b3RlLW5hbWVzCm1heF9hbGxvd2VkX3BhY2tldCAgICAgID0gMTZNCgpbbXlzcWxdCgpbaXNhbWNoa10Ka2V5X2J1ZmZlcl9zaXplICAgICAgICAgICAgICA9IDE2TQo="
 ).decode("utf-8")
+geoliteFiles = ["GeoLite2-City.mmdb", "GeoLite2-Country.mmdb", "GeoLite2-ASN.mmdb"]
 
 
 class col:
@@ -107,10 +104,14 @@ def prepare(rType="MAIN"):
         shutil.copyfile(
             "/home/xtreamcodes/iptv_xtream_codes/config", "/tmp/config.xtmp"
         )
-    if os.path.isfile("/home/xtreamcodes/iptv_xtream_codes/GeoLite2.mmdb"):
-        os.system(
-            "chattr -i /home/xtreamcodes/iptv_xtream_codes/GeoLite2.mmdb > /dev/null"
-        )
+    for geoliteFile in geoliteFiles:
+        if os.path.isfile(
+            f"/home/xtreamcodes/iptv_xtream_codes/bin/maxmind/{geoliteFile}"
+        ):
+            os.system(
+                f"chattr -i /home/xtreamcodes/iptv_xtream_codes/bin/maxmind/{geoliteFile} > /dev/null"
+            )
+
     for rFile in [
         "/var/lib/dpkg/lock-frontend",
         "/var/cache/apt/archives/lock",
@@ -177,61 +178,6 @@ def install(rType="MAIN"):
     return False
 
 
-def update(rType="MAIN"):
-    rlink = "http://test.com/release_22f.zip"
-    printc("Installing Admin Panel")
-    hdr = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.3",
-        "Accept-Encoding": "none",
-        "Accept-Language": "en-US,en;q=0.8",
-        "Connection": "keep-alive",
-    }
-    req = urllib.request(rlink, headers=hdr)
-    try:
-        urllib.urlopen(req)
-    except:
-        printc("Invalid download URL!", col.FAIL)
-        return False
-    print("\n")
-    rURL = rlink
-    printc("Downloading Software Update")
-    print("\n")
-    os.system('wget -q -O "/tmp/update.zip" "%s"' % rURL)
-    if os.path.exists("/tmp/update.zip"):
-        try:
-            is_ok = ZipFile("/tmp/update.zip")
-        except:
-            printc("Invalid link or zip file is corrupted!", col.FAIL)
-            os.remove("/tmp/update.zip")
-            return False
-        printc("Updating Software")
-        # os.system(
-        #     "chattr -i /home/xtreamcodes/iptv_xtream_codes/GeoLite2.mmdb > /dev/null && rm -rf /home/xtreamcodes/iptv_xtream_codes/admin > /dev/null && rm -rf /home/xtreamcodes/iptv_xtream_codes/pytools > /dev/null && unzip /tmp/update.zip -d /tmp/update/ > /dev/null && cp -rf /tmp/update/* /home/xtreamcodes/iptv_xtream_codes/ > /dev/null && rm -rf /tmp/update > /dev/null && rm -rf /tmp/update > /dev/null && wget -q https://github.com/Vateron-Media/Xtream_Update/raw/main/GeoLite2.mmdb -O /home/xtreamcodes/iptv_xtream_codes/GeoLite2.mmdb > /dev/null && chown -R xtreamcodes:xtreamcodes /home/xtreamcodes/ > /dev/null && chmod +x /home/xtreamcodes/iptv_xtream_codes/permissions.sh > /dev/null && chattr +i /home/xtreamcodes/iptv_xtream_codes/GeoLite2.mmdb > /dev/null"
-        # )
-        os.system(
-            "chattr -i /home/xtreamcodes/iptv_xtream_codes/GeoLite2.mmdb > /dev/null && rm -rf /home/xtreamcodes/iptv_xtream_codes/admin > /dev/null && rm -rf /home/xtreamcodes/iptv_xtream_codes/pytools > /dev/null && unzip /tmp/update.zip -d /tmp/update/ > /dev/null && cp -rf /tmp/update/* /home/xtreamcodes/iptv_xtream_codes/ > /dev/null && rm -rf /tmp/update > /dev/null && rm -rf /tmp/update > /dev/null && wget -q https://github.com/Vateron-Media/Xtream_Update/raw/main/GeoLite2.mmdb -O /home/xtreamcodes/iptv_xtream_codes/GeoLite2.mmdb > /dev/null && chown -R xtreamcodes:xtreamcodes /home/xtreamcodes/ > /dev/null && chmod +x /home/xtreamcodes/iptv_xtream_codes/permissions.sh > /dev/null> /dev/null"
-        )
-        if (
-            not "sudo chmod 400 /home/xtreamcodes/iptv_xtream_codes/config"
-            in open("/home/xtreamcodes/iptv_xtream_codes/permissions.sh").read()
-        ):
-            os.system(
-                'echo "#!/bin/bash\nsudo chmod -R 777 /home/xtreamcodes 2>/dev/null\nsudo find /home/xtreamcodes/iptv_xtream_codes/admin/ -type f -exec chmod 644 {} \; 2>/dev/null\nsudo find /home/xtreamcodes/iptv_xtream_codes/admin/ -type d -exec chmod 755 {} \; 2>/dev/null\nsudo find /home/xtreamcodes/iptv_xtream_codes/wwwdir/ -type f -exec chmod 644 {} \; 2>/dev/null\nsudo find /home/xtreamcodes/iptv_xtream_codes/wwwdir/ -type d -exec chmod 755 {} \; 2>/dev/null\nsudo chmod +x /home/xtreamcodes/iptv_xtream_codes/nginx/sbin/nginx 2>/dev/null\nsudo chmod +x /home/xtreamcodes/iptv_xtream_codes/nginx_rtmp/sbin/nginx_rtmp 2>/dev/null\nsudo chmod 400 /home/xtreamcodes/iptv_xtream_codes/config 2>/dev/null" > /home/xtreamcodes/iptv_xtream_codes/permissions.sh'
-            )
-        os.system(
-            "sleep 2 && sudo /home/xtreamcodes/iptv_xtream_codes/permissions.sh > /dev/null"
-        )
-        try:
-            os.remove("/tmp/update.zip")
-        except:
-            pass
-        return True
-    printc("Failed to download installation file!", col.FAIL)
-    return False
-
-
 def mysql(rUsername, rPassword):
     global rMySQLCnf
     printc("Configuring MySQL")
@@ -277,7 +223,7 @@ def mysql(rUsername, rPassword):
                     % (rExtra, generate(20), generate(10), generate(20))
                 )
                 os.system(
-                    "mysql -u root%s -e \"USE xtream_iptvpro; REPLACE INTO streaming_servers (id, server_name, domain_name, server_ip, vpn_ip, ssh_password, ssh_port, diff_time_main, http_broadcast_port, total_clients, system_os, network_interface, latency, status, enable_geoip, geoip_countries, last_check_ago, can_delete, server_hardware, total_services, persistent_connections, rtmp_port, geoip_type, isp_names, isp_type, enable_isp, boost_fpm, http_ports_add, network_guaranteed_speed, https_broadcast_port, https_ports_add, whitelist_ips, watchdog_data, timeshift_only) VALUES (1, 'Main Server', '', '%s', '', NULL, NULL, 0, 25461, 1000, '%s', 'eth0', 0, 1, 0, '', 0, 0, '{}', 3, 0, 25462, 'low_priority', '', 'low_priority', 0, 1, '', 1000, 25463, '', '[\"127.0.0.1\",\"\"]', '{}', 0);\" > /dev/null"
+                    "mysql -u root%s -e \"USE xtream_iptvpro; REPLACE INTO streaming_servers (id, server_name, domain_name, server_ip, vpn_ip, ssh_password, ssh_port, diff_time_main, http_broadcast_port, total_clients, system_os, network_interface, latency, status, enable_geoip, geoip_countries, last_check_ago, can_delete, server_hardware, total_services, persistent_connections, rtmp_port, geoip_type, isp_names, isp_type, enable_isp, boost_fpm, http_ports_add, network_guaranteed_speed, https_broadcast_port, https_ports_add, whitelist_ips, watchdog_data, timeshift_only, http_isp_port, time_offset, script_version, is_main, php_pids, remote_status) VALUES (1, 'Main Server', '', '%s', '', NULL, NULL, 0, 25461, 1000, '%s', 'eth0', 0, 1, 0, '[]', 0, 0, '', 3, 0, 25462, 'low_priority', '', 'low_priority', 0, 0, '', 1000, 25463, '', '[\"127.0.0.1\",\"\"]', '', 0, 8805, 0, 'NULL', 1, '', 1);;\" > /dev/null"
                     % (rExtra, getIP(), getVersion())
                 )
                 os.system(
@@ -300,9 +246,6 @@ def mysql(rUsername, rPassword):
         except:
             printc("Invalid password! Try again", col.FAIL)
     return False
-
-
-# ThVYVkVBElgSVQUPHgYeBxoJFh5BUgY6QERQQhAPQERGUkJmX0VEFEAWWBocFFRVa0hVQRAUXkcXGxdUUGoMUFhSEgMUTUQQVQVaZ1lGREFESlsQTxQXAEdBUEJtXAYTDxUBGxoVEgZSO0dXQkISDRYPDQtaFBk=
 
 
 def encrypt(
@@ -387,20 +330,23 @@ def configure():
     if not os.path.exists("/home/xtreamcodes/iptv_xtream_codes/tv_archive"):
         os.mkdir("/home/xtreamcodes/iptv_xtream_codes/tv_archive/")
     os.system("ln -s /home/xtreamcodes/iptv_xtream_codes/bin/ffmpeg /usr/bin/")
-    os.system(
-        "wget -q https://github.com/Vateron-Media/Xtream_Update/raw/main/GeoLite2.mmdb -O /home/xtreamcodes/iptv_xtream_codes/GeoLite2.mmdb"
-    )
-    os.system(
-        "wget -q https://github.com/Vateron-Media/Xtream_Update/raw/main/pid_monitor.php -O /home/xtreamcodes/iptv_xtream_codes/crons/pid_monitor.php"
-    )
     os.system("chown xtreamcodes:xtreamcodes -R /home/xtreamcodes > /dev/null")
     os.system("chmod -R 0777 /home/xtreamcodes > /dev/null")
-    # os.system("chattr +i /home/xtreamcodes/iptv_xtream_codes/GeoLite2.mmdb > /dev/null")
+    for geoliteFile in geoliteFiles:
+        if os.path.isfile(
+            f"/home/xtreamcodes/iptv_xtream_codes/bin/maxmind/{geoliteFile}"
+        ):
+            os.system(
+                f"chattr +i /home/xtreamcodes/iptv_xtream_codes/bin/maxmind/{geoliteFile} > /dev/null"
+            )
     os.system(
         "sed -i 's|chown -R xtreamcodes:xtreamcodes /home/xtreamcodes|chown -R xtreamcodes:xtreamcodes /home/xtreamcodes 2>/dev/null|g' /home/xtreamcodes/iptv_xtream_codes/start_services.sh"
     )
     os.system(
         "chmod +x /home/xtreamcodes/iptv_xtream_codes/start_services.sh > /dev/null"
+    )
+    os.system(
+        "sleep 2 && sudo /home/xtreamcodes/iptv_xtream_codes/permissions.sh > /dev/null"
     )
     os.system("mount -a")
     os.system("chmod 0700 /home/xtreamcodes/iptv_xtream_codes/config > /dev/null")
@@ -483,7 +429,6 @@ if __name__ == "__main__":
                 configure()
                 if rType.upper() == "MAIN":
                     modifyNginx()
-                    # update(rType.upper()) ## Auto update from install
                 start()
                 printc("Installation completed!", col.OKGREEN, 2)
                 if rType.upper() == "MAIN":
@@ -495,13 +440,5 @@ if __name__ == "__main__":
                 printc("Installation cancelled", col.FAIL)
         else:
             printc("Invalid entries", col.FAIL)
-    # elif rType.upper() == "UPDATE":
-    #     if os.path.exists("/home/xtreamcodes/iptv_xtream_codes/wwwdir/api.php"):
-    #         printc("Update Admin Panel? Y/N?", col.WARNING)
-    #         if input("  ").upper() == "Y":
-    #             if not update(rType.upper()): sys.exit(1)
-    #             printc("Installation completed!", col.OKGREEN, 2)
-    #             start()
-    #         else: printc("Install Xtream Codes Main first!", col.FAIL)
     else:
         printc("Invalid installation type", col.FAIL)

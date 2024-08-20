@@ -11,15 +11,9 @@ import sys
 import base64
 from itertools import cycle
 
-Version_main = "v1.2.0"
-Version_sub = "v1.0.0"
+Version_main = "v1.2.1"
+rDownloadURL = f"https://github.com/Vateron-Media/Xtream_main/releases/download/{Version_main}/main_xui.tar.gz"
 
-rDownloadURL = {
-    "main": "https://github.com/Vateron-Media/Xtream_main/releases/download/%s/main_xui.tar.gz"
-    % Version_main,
-    "sub": "https://github.com/Vateron-Media/Xtream_sub/releases/download/%s/sub_xui.tar.gz"
-    % Version_sub,
-}
 rPackages = [
     "libcurl4",
     "libxslt1-dev",
@@ -34,10 +28,10 @@ rPackages = [
     "mc",
     "libpng16-16",
     "libzip5",
-    "python-is-python2",
+    # "python-is-python2",
     "mariadb-server",
+    "rsync",
 ]
-rInstall = {"MAIN": "main", "LB": "sub"}
 rMySQLCnf = base64.b64decode(
     "IyBYdHJlYW0gQ29kZXMKCltjbGllbnRdCnBvcnQgICAgICAgICAgICA9IDMzMDYKCltteXNxbGRfc2FmZV0KbmljZSAgICAgICAgICAgID0gMAoKW215c3FsZF0KdXNlciAgICAgICAgICAgID0gbXlzcWwKcG9ydCAgICAgICAgICAgID0gNzk5OQpiYXNlZGlyICAgICAgICAgPSAvdXNyCmRhdGFkaXIgICAgICAgICA9IC92YXIvbGliL215c3FsCnRtcGRpciAgICAgICAgICA9IC90bXAKbGMtbWVzc2FnZXMtZGlyID0gL3Vzci9zaGFyZS9teXNxbApza2lwLWV4dGVybmFsLWxvY2tpbmcKc2tpcC1uYW1lLXJlc29sdmU9MQoKYmluZC1hZGRyZXNzICAgICAgICAgICAgPSAqCmtleV9idWZmZXJfc2l6ZSA9IDEyOE0KCm15aXNhbV9zb3J0X2J1ZmZlcl9zaXplID0gNE0KbWF4X2FsbG93ZWRfcGFja2V0ICAgICAgPSA2NE0KbXlpc2FtLXJlY292ZXItb3B0aW9ucyA9IEJBQ0tVUAptYXhfbGVuZ3RoX2Zvcl9zb3J0X2RhdGEgPSA4MTkyCnF1ZXJ5X2NhY2hlX2xpbWl0ICAgICAgID0gNE0KcXVlcnlfY2FjaGVfc2l6ZSAgICAgICAgPSAwCnF1ZXJ5X2NhY2hlX3R5cGUJPSAwCgpleHBpcmVfbG9nc19kYXlzICAgICAgICA9IDEwCm1heF9iaW5sb2dfc2l6ZSAgICAgICAgID0gMTAwTQoKbWF4X2Nvbm5lY3Rpb25zICA9IDIwMDAgI3JlY29tbWVuZGVkIGZvciAxNkdCIHJhbSAKYmFja19sb2cgPSA0MDk2Cm9wZW5fZmlsZXNfbGltaXQgPSAxNjM4NAppbm5vZGJfb3Blbl9maWxlcyA9IDE2Mzg0Cm1heF9jb25uZWN0X2Vycm9ycyA9IDMwNzIKdGFibGVfb3Blbl9jYWNoZSA9IDQwOTYKdGFibGVfZGVmaW5pdGlvbl9jYWNoZSA9IDQwOTYKCgp0bXBfdGFibGVfc2l6ZSA9IDFHCm1heF9oZWFwX3RhYmxlX3NpemUgPSAxRwoKaW5ub2RiX2J1ZmZlcl9wb29sX3NpemUgPSAxMkcgI3JlY29tbWVuZGVkIGZvciAxNkdCIHJhbQppbm5vZGJfYnVmZmVyX3Bvb2xfaW5zdGFuY2VzID0gMQppbm5vZGJfcmVhZF9pb190aHJlYWRzID0gNjQKaW5ub2RiX3dyaXRlX2lvX3RocmVhZHMgPSA2NAppbm5vZGJfdGhyZWFkX2NvbmN1cnJlbmN5ID0gMAppbm5vZGJfZmx1c2hfbG9nX2F0X3RyeF9jb21taXQgPSAwCmlubm9kYl9mbHVzaF9tZXRob2QgPSBPX0RJUkVDVApwZXJmb3JtYW5jZV9zY2hlbWEgPSBPTgppbm5vZGItZmlsZS1wZXItdGFibGUgPSAxCmlubm9kYl9pb19jYXBhY2l0eT0yMDAwMAppbm5vZGJfdGFibGVfbG9ja3MgPSAwCmlubm9kYl9sb2NrX3dhaXRfdGltZW91dCA9IDAKaW5ub2RiX2RlYWRsb2NrX2RldGVjdCA9IDAKaW5ub2RiX2xvZ19maWxlX3NpemUgPSA1MTJNCgpzcWwtbW9kZT0iTk9fRU5HSU5FX1NVQlNUSVRVVElPTiIKCltteXNxbGR1bXBdCnF1aWNrCnF1b3RlLW5hbWVzCm1heF9hbGxvd2VkX3BhY2tldCAgICAgID0gMTZNCgpbbXlzcWxdCgpbaXNhbWNoa10Ka2V5X2J1ZmZlcl9zaXplICAgICAgICAgICAgICA9IDE2TQo="
 ).decode("utf-8")
@@ -95,21 +89,15 @@ def printc(rText, rColour="\033[94m", rPadding=0):
     print(" ")
 
 
-def prepare(rType="MAIN"):
+def prepare():
     global rPackages
-    if rType != "MAIN":
-        rPackages = rPackages[:-3]
     printc("Preparing Installation")
-    if os.path.isfile("/home/xtreamcodes/iptv_xtream_codes/config"):
-        shutil.copyfile(
-            "/home/xtreamcodes/iptv_xtream_codes/config", "/tmp/config.xtmp"
-        )
+    if os.path.isfile("/home/xtreamcodes/config"):
+        shutil.copyfile("/home/xtreamcodes/config", "/tmp/config.xtmp")
     for geoliteFile in geoliteFiles:
-        if os.path.isfile(
-            f"/home/xtreamcodes/iptv_xtream_codes/bin/maxmind/{geoliteFile}"
-        ):
+        if os.path.isfile(f"/home/xtreamcodes/bin/maxmind/{geoliteFile}"):
             os.system(
-                f"chattr -i /home/xtreamcodes/iptv_xtream_codes/bin/maxmind/{geoliteFile} > /dev/null"
+                f"chattr -i /home/xtreamcodes/bin/maxmind/{geoliteFile} > /dev/null"
             )
 
     for rFile in [
@@ -123,24 +111,32 @@ def prepare(rType="MAIN"):
             pass
     os.system("apt-get update > /dev/null")
     os.system("apt-get -y full-upgrade > /dev/null")
-    if rType == "MAIN":
 
-        printc("Install MariaDB 10.5 repository")
-        os.system("apt-get install -y software-properties-common > /dev/null")
-        os.system(
-            "apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8 >/dev/null 2>&1"
-        )
-        os.system(
-            "add-apt-repository 'deb [arch=amd64,arm64,ppc64el] http://mirror.lstn.net/mariadb/repo/10.5/ubuntu focal main'  > /dev/null"
-        )
-        os.system("apt-get update > /dev/null")
+    printc("Install MariaDB 10.5 repository")
+    os.system("apt-get install -y software-properties-common > /dev/null")
+    os.system(
+        "apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8 >/dev/null 2>&1"
+    )
+    os.system(
+        "add-apt-repository 'deb [arch=amd64,arm64,ppc64el] http://mirror.lstn.net/mariadb/repo/10.5/ubuntu focal main'  > /dev/null"
+    )
+    os.system("apt-get update > /dev/null")
     for rPackage in rPackages:
         printc("Installing %s" % rPackage)
         os.system("apt-get install %s -y > /dev/null" % rPackage)
-    printc("Installing pip2 and python2 paramiko")
+    # printc("Installing pip2 and python2 paramiko")
+    # os.system(
+    #     "add-apt-repository universe > /dev/null 2>&1 && curl https://bootstrap.pypa.io/get-pip.py --output get-pip.py > /dev/null 2>&1 && python2 get-pip.py > /dev/null 2>&1 && pip2 install paramiko > /dev/null 2>&1"
+    # )
+    printc("Installing pip3")
     os.system(
-        "add-apt-repository universe > /dev/null 2>&1 && curl https://bootstrap.pypa.io/get-pip.py --output get-pip.py > /dev/null 2>&1 && python2 get-pip.py > /dev/null 2>&1 && pip2 install paramiko > /dev/null 2>&1"
+        "add-apt-repository universe > /dev/null 2>&1 && curl https://bootstrap.pypa.io/get-pip.py --output get-pip.py > /dev/null 2>&1 && python3 get-pip.py > /dev/null 2>&1"
     )
+    printc("Installing pip modules")
+    os.system(
+        "pip3 install ndg-httpsclient > /dev/null 2>&1 && pip3 install pyopenssl > /dev/null 2>&1 && pip3 install pyasn1 > /dev/null 2>&1"
+    )
+
     os.system("apt-get install -f > /dev/null")  # Clean up above
     try:
         subprocess.check_output("getent passwd xtreamcodes > /dev/null".split())
@@ -155,15 +151,10 @@ def prepare(rType="MAIN"):
     return True
 
 
-def install(rType="MAIN"):
-    global rInstall, rDownloadURL
+def install():
+    global rDownloadURL
     printc("Downloading Software")
-    try:
-        rURL = rDownloadURL[rInstall[rType]]
-    except:
-        printc("Invalid download URL!", col.FAIL)
-        return False
-    os.system('wget -q -O "/tmp/xtreamcodes.tar.gz" "%s"' % rURL)
+    os.system('wget -q -O "/tmp/xtreamcodes.tar.gz" "%s"' % rDownloadURL)
     if os.path.exists("/tmp/xtreamcodes.tar.gz"):
         printc("Installing Software")
         os.system(
@@ -215,7 +206,7 @@ def mysql(rUsername, rPassword):
                     % (rExtra, rUsername)
                 )
                 os.system(
-                    "mysql -u root%s xtream_iptvpro < /home/xtreamcodes/iptv_xtream_codes/database.sql > /dev/null"
+                    "mysql -u root%s xtream_iptvpro < /home/xtreamcodes/database.sql > /dev/null"
                     % rExtra
                 )
                 os.system(
@@ -223,7 +214,7 @@ def mysql(rUsername, rPassword):
                     % (rExtra, generate(20), generate(10), generate(20))
                 )
                 os.system(
-                    "mysql -u root%s -e \"USE xtream_iptvpro; REPLACE INTO streaming_servers (id, server_name, domain_name, server_ip, vpn_ip, ssh_password, ssh_port, diff_time_main, http_broadcast_port, total_clients, system_os, network_interface, latency, status, enable_geoip, geoip_countries, last_check_ago, can_delete, server_hardware, total_services, persistent_connections, rtmp_port, geoip_type, isp_names, isp_type, enable_isp, boost_fpm, http_ports_add, network_guaranteed_speed, https_broadcast_port, https_ports_add, whitelist_ips, watchdog_data, timeshift_only, http_isp_port, time_offset, script_version, is_main, php_pids, remote_status) VALUES (1, 'Main Server', '', '%s', '', NULL, NULL, 0, 25461, 1000, '%s', 'eth0', 0, 1, 0, '[]', 0, 0, '', 3, 0, 25462, 'low_priority', '', 'low_priority', 0, 0, '', 1000, 25463, '', '[\"127.0.0.1\",\"\"]', '', 0, 8805, 0, 'NULL', 1, '', 1);;\" > /dev/null"
+                    "mysql -u root%s -e \"USE xtream_iptvpro; REPLACE INTO streaming_servers (id, server_name, domain_name, server_ip, vpn_ip, ssh_password, ssh_port, diff_time_main, http_broadcast_port, total_clients, system_os, network_interface, latency, status, enable_geoip, geoip_countries, last_check_ago, can_delete, server_hardware, total_services, persistent_connections, rtmp_port, geoip_type, isp_names, isp_type, enable_isp, http_ports_add, network_guaranteed_speed, https_broadcast_port, https_ports_add, whitelist_ips, watchdog_data, timeshift_only, http_isp_port, time_offset, script_version, is_main, php_pids, remote_status) VALUES (1, 'Main Server', '', '%s', '', NULL, NULL, 0, 25461, 1000, '%s', 'eth0', 0, 1, 0, '[]', 0, 0, '', 3, 0, 25462, 'low_priority', '', 'low_priority', 0, '', 1000, 25463, '', '[\"127.0.0.1\",\"\"]', '', 0, 8805, 0, 'NULL', 1, '', 1);;\" > /dev/null"
                     % (rExtra, getIP(), getVersion())
                 )
                 os.system(
@@ -239,7 +230,7 @@ def mysql(rUsername, rPassword):
                     % rExtra
                 )
             try:
-                os.remove("/home/xtreamcodes/iptv_xtream_codes/database.sql")
+                os.remove("/home/xtreamcodes/database.sql")
             except:
                 pass
             return True
@@ -256,7 +247,7 @@ def encrypt(
     rServerID=1,
     rPort=7999,
 ):
-    if os.path.isfile("/home/xtreamcodes/iptv_xtream_codes/config"):
+    if os.path.isfile("/home/xtreamcodes/config"):
         rDecrypt = decrypt()
         rHost = rDecrypt["host"]
         rPassword = rDecrypt["db_pass"]
@@ -266,10 +257,10 @@ def encrypt(
         rPort = int(rDecrypt["db_port"])
     printc("Encrypting...")
     try:
-        os.remove("/home/xtreamcodes/iptv_xtream_codes/config")
+        os.remove("/home/xtreamcodes/config")
     except:
         pass
-    rf = open("/home/xtreamcodes/iptv_xtream_codes/config", "wb")
+    rf = open("/home/xtreamcodes/config", "wb")
     rf.write(
         base64.b64encode(
             bytes(
@@ -289,7 +280,7 @@ def encrypt(
 
 
 def decrypt():
-    rConfigPath = "/home/xtreamcodes/iptv_xtream_codes/config"
+    rConfigPath = "/home/xtreamcodes/config"
     try:
         return json.loads(
             "".join(
@@ -306,68 +297,60 @@ def decrypt():
 
 def configure():
     printc("Configuring System")
-    if not "/home/xtreamcodes/iptv_xtream_codes/" in open("/etc/fstab").read():
+    if not "/home/xtreamcodes/" in open("/etc/fstab").read():
         rFile = open("/etc/fstab", "a")
         rFile.write(
-            "tmpfs /home/xtreamcodes/iptv_xtream_codes/streams tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=90% 0 0\ntmpfs /home/xtreamcodes/iptv_xtream_codes/tmp tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=2G 0 0"
+            "tmpfs /home/xtreamcodes/content/streams tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=90% 0 0\ntmpfs /home/xtreamcodes/tmp tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=2G 0 0"
         )
         rFile.close()
     if not "xtreamcodes" in open("/etc/sudoers").read():
         os.system(
-            'echo "xtreamcodes ALL = (root) NOPASSWD: /sbin/iptables, /usr/bin/chattr, /usr/bin/python2, /usr/bin/python" >> /etc/sudoers'
+            'echo "xtreamcodes ALL = (root) NOPASSWD: /sbin/iptables, /usr/bin/chattr, /usr/bin/python3, /usr/bin/python" >> /etc/sudoers'
         )
     if not os.path.exists("/etc/init.d/xtreamcodes"):
         rFile = open("/etc/init.d/xtreamcodes", "w")
-        rFile.write(
-            "#! /bin/bash\n/home/xtreamcodes/iptv_xtream_codes/start_services.sh"
-        )
+        rFile.write("#! /bin/bash\n/home/xtreamcodes/service.sh start")
         rFile.close()
         os.system("chmod +x /etc/init.d/xtreamcodes > /dev/null")
     try:
         os.remove("/usr/bin/ffmpeg")
     except:
         pass
-    if not os.path.exists("/home/xtreamcodes/iptv_xtream_codes/tv_archive"):
-        os.mkdir("/home/xtreamcodes/iptv_xtream_codes/tv_archive/")
-    os.system("ln -s /home/xtreamcodes/iptv_xtream_codes/bin/ffmpeg /usr/bin/")
+    # if not os.path.exists("/home/xtreamcodes/content/tv_archive"):
+    #     os.mkdir("/home/xtreamcodes/content/tv_archive/")
+    os.system("ln -s /home/xtreamcodes/bin/ffmpeg /usr/bin/")
     os.system("chown xtreamcodes:xtreamcodes -R /home/xtreamcodes > /dev/null")
-    os.system("chmod -R 0777 /home/xtreamcodes > /dev/null")
+    # os.system("chmod -R 0777 /home/xtreamcodes > /dev/null")
     for geoliteFile in geoliteFiles:
-        if os.path.isfile(
-            f"/home/xtreamcodes/iptv_xtream_codes/bin/maxmind/{geoliteFile}"
-        ):
+        if os.path.isfile(f"/home/xtreamcodes/bin/maxmind/{geoliteFile}"):
             os.system(
-                f"chattr +i /home/xtreamcodes/iptv_xtream_codes/bin/maxmind/{geoliteFile} > /dev/null"
+                f"chattr +i /home/xtreamcodes/bin/maxmind/{geoliteFile} > /dev/null"
             )
     os.system(
-        "sed -i 's|chown -R xtreamcodes:xtreamcodes /home/xtreamcodes|chown -R xtreamcodes:xtreamcodes /home/xtreamcodes 2>/dev/null|g' /home/xtreamcodes/iptv_xtream_codes/start_services.sh"
+        "sed -i 's|chown -R xtreamcodes:xtreamcodes /home/xtreamcodes|chown -R xtreamcodes:xtreamcodes /home/xtreamcodes 2>/dev/null|g' /home/xtreamcodes/service.sh start"
     )
-    os.system(
-        "chmod +x /home/xtreamcodes/iptv_xtream_codes/start_services.sh > /dev/null"
-    )
-    os.system(
-        "sleep 2 && sudo /home/xtreamcodes/iptv_xtream_codes/permissions.sh > /dev/null"
-    )
+    os.system("chmod +x /home/xtreamcodes/service.sh start > /dev/null")
+    os.system("sleep 2 && sudo /home/xtreamcodes/permissions.sh > /dev/null")
     os.system("mount -a")
-    os.system("chmod 0700 /home/xtreamcodes/iptv_xtream_codes/config > /dev/null")
+    os.system("chmod 0700 /home/xtreamcodes/config > /dev/null")
     os.system(
-        'sed -i \'s|echo "Xtream Codes Reborn";|header("Location: https://www.google.com/");|g\' /home/xtreamcodes/iptv_xtream_codes/wwwdir/index.php'
+        'sed -i \'s|echo "Xtream Codes Reborn";|header("Location: https://www.google.com/");|g\' /home/xtreamcodes/wwwdir/index.php'
     )
     # #new alias, shortcuts, restartpanel and reloadnginx
-    # os.system('echo "alias restartpanel=\'sudo /home/xtreamcodes/iptv_xtream_codes/start_services.sh && echo done\'\nalias reloadnginx=\'sudo /home/xtreamcodes/iptv_xtream_codes/nginx/sbin/nginx -s reload && echo done\'" > /root/.bash_aliases')
+    # os.system('echo "alias restartpanel=\'sudo /home/xtreamcodes/service.sh start && echo done\'\nalias reloadnginx=\'sudo /home/xtreamcodes/bin/nginx/sbin/nginx -s reload && echo done\'" > /root/.bash_aliases')
     # os.system("source /root/.bashrc > /dev/null")
-    if "api.xtream-codes.com" not in open("/etc/hosts").read():
-        os.system('echo "127.0.0.1    api.xtream-codes.com" >> /etc/hosts')
-    if "downloads.xtream-codes.com" not in open("/etc/hosts").read():
-        os.system('echo "127.0.0.1    downloads.xtream-codes.com" >> /etc/hosts')
-    if "xtream-codes.com" not in open("/etc/hosts").read():
-        os.system('echo "127.0.0.1    xtream-codes.com" >> /etc/hosts')
+    # if "api.xtream-codes.com" not in open("/etc/hosts").read():
+    #     os.system('echo "127.0.0.1    api.xtream-codes.com" >> /etc/hosts')
+    # if "downloads.xtream-codes.com" not in open("/etc/hosts").read():
+    #     os.system('echo "127.0.0.1    downloads.xtream-codes.com" >> /etc/hosts')
+    # if "xtream-codes.com" not in open("/etc/hosts").read():
+    #     os.system('echo "127.0.0.1    xtream-codes.com" >> /etc/hosts')
     if (
-        "@reboot root /home/xtreamcodes/iptv_xtream_codes/start_services.sh"
+        "@reboot root /home/xtreamcodes/service.sh start"
         not in open("/etc/crontab").read()
     ):
         os.system(
-            'echo "@reboot root /home/xtreamcodes/iptv_xtream_codes/start_services.sh" >> /etc/crontab'
+            'echo "@reboot root /home/xtreamcodes/service.sh start" >> /etc/crontab'
         )
 
 
@@ -376,18 +359,19 @@ def start(first=True):
         printc("Starting Xtream Codes")
     else:
         printc("Restarting Xtream Codes")
-    os.system("/home/xtreamcodes/iptv_xtream_codes/start_services.sh > /dev/null")
+
+    os.system("/home/xtreamcodes/service.sh start> /dev/null")
 
 
 def modifyNginx():
     printc("Modifying Nginx")
-    rPath = "/home/xtreamcodes/iptv_xtream_codes/nginx/conf/nginx.conf"
+    rPath = "/home/xtreamcodes/bin/nginx/conf/nginx.conf"
     rPrevData = open(rPath, "r").read()
     if "listen 25500;" not in rPrevData:
         shutil.copy(rPath, "%s.xc" % rPath)
         rData = (
             "}".join(rPrevData.split("}")[:-1])
-            + "    server {\n        listen 25500;\n        index index.php index.html index.htm;\n        root /home/xtreamcodes/iptv_xtream_codes/admin/;\n\n        location ~ \.php$ {\n                    limit_req zone=one burst=8;\n            try_files $uri =404;\n                 fastcgi_index index.php;\n         fastcgi_pass php;\n                      include fastcgi_params;\n                       fastcgi_buffering on;\n                 fastcgi_buffers 96 32k;\n                       fastcgi_buffer_size 32k;\n                      fastcgi_max_temp_file_size 0;\n                 fastcgi_keep_conn on;\n                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;\n                 fastcgi_param SCRIPT_NAME $fastcgi_script_name;\n        }\n    }\n}"
+            + "    server {\n        listen 25500;\n        index index.php index.html index.htm;\n        root /home/xtreamcodes/admin/;\n\n        location ~ \.php$ {\n                    limit_req zone=one burst=8;\n            try_files $uri =404;\n                 fastcgi_index index.php;\n         fastcgi_pass php;\n                      include fastcgi_params;\n                       fastcgi_buffering on;\n                 fastcgi_buffers 96 32k;\n                       fastcgi_buffer_size 32k;\n                      fastcgi_max_temp_file_size 0;\n                 fastcgi_keep_conn on;\n                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;\n                 fastcgi_param SCRIPT_NAME $fastcgi_script_name;\n        }\n    }\n}"
         )
         rFile = open(rPath, "w")
         rFile.write(rData)
@@ -395,50 +379,32 @@ def modifyNginx():
 
 
 if __name__ == "__main__":
-    printc("XtreamUI 22f Ubuntu 20.04 - Moded Divarion-D", col.OKGREEN, 2)
+    printc("XtreamUI Ubuntu 20.04 - Moded Divarion-D", col.OKGREEN, 2)
     print(" ")
-    rType = input("  Installation Type [MAIN, LB]: ")
-    print(" ")
-    if rType.upper() in ["MAIN", "LB"]:
-        if rType.upper() == "LB":
-            rHost = input("  Main Server IP Address: ")
-            rPassword = input("  MySQL Password: ")
-            try:
-                rServerID = int(input("  Load Balancer Server ID: "))
-            except:
-                rServerID = -1
+    rHost = "127.0.0.1"
+    rPassword = generate()
+    rServerID = 1
+    rUsername = "user_iptvpro"
+    rDatabase = "xtream_iptvpro"
+    rPort = 7999
+    if len(rHost) > 0 and len(rPassword) > 0 and rServerID > -1:
+        printc("Start installation? Y/N", col.WARNING)
+        if input("  ").upper() == "Y":
             print(" ")
+            if not mysql(rUsername, rPassword):
+                sys.exit(1)
+            encrypt(rHost, rUsername, rPassword, rDatabase, rServerID, rPort)
+            configure()
+            modifyNginx()
+            start()
+            printc("Installation completed!", col.OKGREEN, 2)
+            printc("Please store your MySQL password!")
+            printc(rPassword)
+            printc("Admin UI: http://%s:25500" % getIP())
+            printc("Admin UI default login is admin/admin")
         else:
-            rHost = "127.0.0.1"
-            rPassword = generate()
-            rServerID = 1
-        rUsername = "user_iptvpro"
-        rDatabase = "xtream_iptvpro"
-        rPort = 7999
-        if len(rHost) > 0 and len(rPassword) > 0 and rServerID > -1:
-            printc("Start installation? Y/N", col.WARNING)
-            if input("  ").upper() == "Y":
-                print(" ")
-                rRet = prepare(rType.upper())
-                if not install(rType.upper()):
-                    sys.exit(1)
-                if rType.upper() == "MAIN":
-                    if not mysql(rUsername, rPassword):
-                        sys.exit(1)
-                encrypt(rHost, rUsername, rPassword, rDatabase, rServerID, rPort)
-                configure()
-                if rType.upper() == "MAIN":
-                    modifyNginx()
-                start()
-                printc("Installation completed!", col.OKGREEN, 2)
-                if rType.upper() == "MAIN":
-                    printc("Please store your MySQL password!")
-                    printc(rPassword)
-                    printc("Admin UI: http://%s:25500" % getIP())
-                    printc("Admin UI default login is admin/admin")
-            else:
-                printc("Installation cancelled", col.FAIL)
-        else:
-            printc("Invalid entries", col.FAIL)
+            printc("Installation cancelled", col.FAIL)
     else:
-        printc("Invalid installation type", col.FAIL)
+        printc("Invalid entries", col.FAIL)
+else:
+    printc("Invalid installation type", col.FAIL)

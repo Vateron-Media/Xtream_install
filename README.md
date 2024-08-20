@@ -18,7 +18,7 @@ Currently supports linux 20
 
 Update your ubuntu first, then install panel
 
-```sudo apt update && sudo apt full-upgrade -y && sudo apt install python2 -y;```
+```sudo apt update && sudo apt full-upgrade -y```
 
 ```rm install.py; wget https://raw.githubusercontent.com/Vateron-Media/Xtream_install/main/install.py;```
 

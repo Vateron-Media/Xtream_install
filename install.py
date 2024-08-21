@@ -391,6 +391,9 @@ if __name__ == "__main__":
         printc("Start installation? Y/N", col.WARNING)
         if input("  ").upper() == "Y":
             print(" ")
+            rRet = prepare()
+            if not install():
+                sys.exit(1)
             if not mysql(rUsername, rPassword):
                 sys.exit(1)
             encrypt(rHost, rUsername, rPassword, rDatabase, rServerID, rPort)
@@ -406,5 +409,3 @@ if __name__ == "__main__":
             printc("Installation cancelled", col.FAIL)
     else:
         printc("Invalid entries", col.FAIL)
-else:
-    printc("Invalid installation type", col.FAIL)

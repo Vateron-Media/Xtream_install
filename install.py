@@ -11,7 +11,7 @@ import sys
 import base64
 from itertools import cycle
 
-Version_main = "v1.2.1"
+Version_main = "v1.2.2"
 rDownloadURL = f"https://github.com/Vateron-Media/Xtream_main/releases/download/{Version_main}/main_xui.tar.gz"
 
 rPackages = [

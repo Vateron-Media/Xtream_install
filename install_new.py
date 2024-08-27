@@ -288,6 +288,10 @@ if __name__ == "__main__":
         % rExtra
     )
     os.system(
+        "mysql -u root%s -e \"UPDATE `streaming_servers` SET `server_ip`='%s', `system_os`='%s', `network_interface` = 'auto' WHERE `id`=1\" > /dev/null"
+        % (rExtra, getIP(), getVersion())
+    )
+    os.system(
         "sudo mysql -u root%s -e \"CREATE USER '%s'@'localhost' IDENTIFIED BY '%s';\""
         % (rExtra, rUsername, rPassword)
     )
@@ -394,10 +398,9 @@ if __name__ == "__main__":
 
     if not os.path.exists("/home/xtreamcodes/tmp"):
         os.mkdir("/home/xtreamcodes/tmp")
-    
+
     if not os.path.exists("/home/xtreamcodes/logs"):
         os.mkdir("/home/xtreamcodes/logs")
-
 
     if not os.path.exists("/home/xtreamcodes/content"):
         os.mkdir("/home/xtreamcodes/content")

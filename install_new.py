@@ -288,7 +288,7 @@ if __name__ == "__main__":
         % rExtra
     )
     os.system(
-        "mysql -u root%s -e \"UPDATE `streaming_servers` SET `server_ip`='%s', `system_os`='%s', `network_interface` = 'auto' WHERE `id`=1\" > /dev/null"
+        "sudo mysql -u root%s -e \"USE xtream_iptvpro; UPDATE `streaming_servers` SET `server_ip`='%s', `system_os`='%s', `network_interface` = 'auto' WHERE `id`=1\" > /dev/null"
         % (rExtra, getIP(), getVersion())
     )
     os.system(

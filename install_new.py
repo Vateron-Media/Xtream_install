@@ -10,7 +10,7 @@ import sys
 import base64
 import io
 
-Version_main = "v1.2.2"
+Version_main = "v1.2.3"
 rDownloadURL = f"https://github.com/Vateron-Media/Xtream_main/releases/download/{Version_main}/main_xui.tar.gz"
 
 rPath = os.path.dirname(os.path.realpath(__file__))

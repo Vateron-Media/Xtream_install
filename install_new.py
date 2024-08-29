@@ -90,13 +90,6 @@ def getIP():
     return s.getsockname()[0]
 
 
-def getVersion():
-    try:
-        return subprocess.check_output("lsb_release -d".split()).split(":")[-1].strip()
-    except:
-        return ""
-
-
 def printc(rText, rColour=col.OKBLUE, rPadding=0):
     rLeft = int(30 - (len(rText) / 2))
     rRight = 60 - rLeft - len(rText)

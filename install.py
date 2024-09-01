@@ -170,8 +170,8 @@ if __name__ == "__main__":
 
     printc("Updating system")
 
-    os.system("apt-get update > /dev/null")
-    os.system("apt-get -y full-upgrade > /dev/null")
+    os.system("apt-get update")
+    os.system("apt-get -y full-upgrade")
     os.system(
         "sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install software-properties-common"
     )
@@ -279,6 +279,10 @@ if __name__ == "__main__":
     os.system(
         "sudo mysql -u root%s -e \"USE xtream_iptvpro; CREATE TABLE IF NOT EXISTS dashboard_statistics (id int(11) NOT NULL AUTO_INCREMENT, type varchar(16) NOT NULL DEFAULT '', time int(16) NOT NULL DEFAULT '0', count int(16) NOT NULL DEFAULT '0', PRIMARY KEY (id)) ENGINE=InnoDB DEFAULT CHARSET=latin1; INSERT INTO dashboard_statistics (type, time, count) VALUES('conns', UNIX_TIMESTAMP(), 0),('users', UNIX_TIMESTAMP(), 0);\" > /dev/null"
         % rExtra
+    )
+    os.system(
+        "mysql -u root%s -e \"USE xtream_iptvpro; UPDATE settings SET live_streaming_pass = '%s', unique_id = '%s', crypt_load_balancing = '%s';\" > /dev/null"
+        % (rExtra, generate(20), generate(10), generate(20))
     )
     os.system(
         "sudo mysql -u root%s -e \"CREATE USER '%s'@'localhost' IDENTIFIED BY '%s';\""

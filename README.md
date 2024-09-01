@@ -6,6 +6,7 @@
 Decoded Xtream panel. Based on the release from NeySlim 22F.
 
 ## Warning
+**The panel is currently in alpha test and therefore the panel may not work in some updates.**
 **At the moment SUB is not working or not working properly. Work with SUB will start after all global problems in MAIN have been resolved**
 
 ## Repositories 

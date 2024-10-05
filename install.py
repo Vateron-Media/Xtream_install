@@ -335,7 +335,7 @@ if __name__ == "__main__":
     if not "/home/xtreamcodes/" in open("/etc/fstab").read():
         rFile = io.open("/etc/fstab", "a", encoding="utf-8")
         rFile.write(
-            "tmpfs /home/xtreamcodes/content/streams tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=90% 0 0\ntmpfs /home/xtreamcodes/tmp tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=2G 0 0"
+            "tmpfs /home/xtreamcodes/content/streams tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=90% 0 0\ntmpfs /home/xtreamcodes/tmp tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=6G 0 0"
         )
         rFile.close()
     if not "xtreamcodes" in open("/etc/sudoers").read():

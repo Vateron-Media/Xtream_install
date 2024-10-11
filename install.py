@@ -1,16 +1,34 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-import time
+import io
 import os
 import random
 import shutil
 import socket
 import subprocess
 import sys
-import base64
-import io
+import time
+from urllib.parse import urlparse
 
-Version_main = "v1.2.3"
+import requests
+
+
+def get_recent_stable_release():
+    url = "https://github.com/Vateron-Media/Xtream_main/releases/latest"
+    try:
+        response = requests.get(url, allow_redirects=True)
+        final_url = response.url
+        version = os.path.basename(urlparse(final_url).path)
+
+        if not version:
+            return None
+
+        return version
+    except requests.RequestException:
+        return None
+
+
+Version_main = get_recent_stable_release()
 rDownloadURL = f"https://github.com/Vateron-Media/Xtream_main/releases/download/{Version_main}/main_xui.tar.gz"
 
 rPath = os.path.dirname(os.path.realpath(__file__))
@@ -46,11 +64,11 @@ rPackages = [
     "libzip5",
     "mariadb-server",
     "rsync",
+    "libmaxminddb0",
+    "libmaxminddb-dev",
 ]
 rRemove = ["mysql-server"]
-rMySQLCnf = base64.b64decode(
-    "IyBYdHJlYW0gQ29kZXMKCltjbGllbnRdCnBvcnQgICAgICAgICAgICA9IDMzMDYKCltteXNxbGRfc2FmZV0KbmljZSAgICAgICAgICAgID0gMAoKW215c3FsZF0KdXNlciAgICAgICAgICAgID0gbXlzcWwKcG9ydCAgICAgICAgICAgID0gNzk5OQpiYXNlZGlyICAgICAgICAgPSAvdXNyCmRhdGFkaXIgICAgICAgICA9IC92YXIvbGliL215c3FsCnRtcGRpciAgICAgICAgICA9IC90bXAKbGMtbWVzc2FnZXMtZGlyID0gL3Vzci9zaGFyZS9teXNxbApza2lwLWV4dGVybmFsLWxvY2tpbmcKc2tpcC1uYW1lLXJlc29sdmU9MQoKYmluZC1hZGRyZXNzICAgICAgICAgICAgPSAqCmtleV9idWZmZXJfc2l6ZSA9IDEyOE0KCm15aXNhbV9zb3J0X2J1ZmZlcl9zaXplID0gNE0KbWF4X2FsbG93ZWRfcGFja2V0ICAgICAgPSA2NE0KbXlpc2FtLXJlY292ZXItb3B0aW9ucyA9IEJBQ0tVUAptYXhfbGVuZ3RoX2Zvcl9zb3J0X2RhdGEgPSA4MTkyCnF1ZXJ5X2NhY2hlX2xpbWl0ICAgICAgID0gNE0KcXVlcnlfY2FjaGVfc2l6ZSAgICAgICAgPSAwCnF1ZXJ5X2NhY2hlX3R5cGUJPSAwCgpleHBpcmVfbG9nc19kYXlzICAgICAgICA9IDEwCm1heF9iaW5sb2dfc2l6ZSAgICAgICAgID0gMTAwTQoKbWF4X2Nvbm5lY3Rpb25zICA9IDIwMDAgI3JlY29tbWVuZGVkIGZvciAxNkdCIHJhbSAKYmFja19sb2cgPSA0MDk2Cm9wZW5fZmlsZXNfbGltaXQgPSAxNjM4NAppbm5vZGJfb3Blbl9maWxlcyA9IDE2Mzg0Cm1heF9jb25uZWN0X2Vycm9ycyA9IDMwNzIKdGFibGVfb3Blbl9jYWNoZSA9IDQwOTYKdGFibGVfZGVmaW5pdGlvbl9jYWNoZSA9IDQwOTYKCgp0bXBfdGFibGVfc2l6ZSA9IDFHCm1heF9oZWFwX3RhYmxlX3NpemUgPSAxRwoKaW5ub2RiX2J1ZmZlcl9wb29sX3NpemUgPSAxMkcgI3JlY29tbWVuZGVkIGZvciAxNkdCIHJhbQppbm5vZGJfYnVmZmVyX3Bvb2xfaW5zdGFuY2VzID0gMQppbm5vZGJfcmVhZF9pb190aHJlYWRzID0gNjQKaW5ub2RiX3dyaXRlX2lvX3RocmVhZHMgPSA2NAppbm5vZGJfdGhyZWFkX2NvbmN1cnJlbmN5ID0gMAppbm5vZGJfZmx1c2hfbG9nX2F0X3RyeF9jb21taXQgPSAwCmlubm9kYl9mbHVzaF9tZXRob2QgPSBPX0RJUkVDVApwZXJmb3JtYW5jZV9zY2hlbWEgPSBPTgppbm5vZGItZmlsZS1wZXItdGFibGUgPSAxCmlubm9kYl9pb19jYXBhY2l0eT0yMDAwMAppbm5vZGJfdGFibGVfbG9ja3MgPSAwCmlubm9kYl9sb2NrX3dhaXRfdGltZW91dCA9IDAKaW5ub2RiX2RlYWRsb2NrX2RldGVjdCA9IDAKaW5ub2RiX2xvZ19maWxlX3NpemUgPSA1MTJNCgpzcWwtbW9kZT0iTk9fRU5HSU5FX1NVQlNUSVRVVElPTiIKCltteXNxbGR1bXBdCnF1aWNrCnF1b3RlLW5hbWVzCm1heF9hbGxvd2VkX3BhY2tldCAgICAgID0gMTZNCgpbbXlzcWxdCgpbaXNhbWNoa10Ka2V5X2J1ZmZlcl9zaXplICAgICAgICAgICAgICA9IDE2TQo="
-).decode("utf-8")
+rMySQLCnf = '# Xtream Codes\n[client]\nport                            = 3306\n\n[mysqld_safe]\nnice                            = 0\n\n[mysqld]\nuser                            = mysql\nport                            = 7999\nbasedir                         = /usr\ndatadir                         = /var/lib/mysql\ntmpdir                          = /tmp\nlc-messages-dir                 = /usr/share/mysql\nskip-external-locking\nskip-name-resolve\nbind-address                    = *\n\nkey_buffer_size                 = 128M\nmyisam_sort_buffer_size         = 4M\nmax_allowed_packet              = 64M\nmyisam-recover-options          = BACKUP\nmax_length_for_sort_data        = 8192\nquery_cache_limit               = 0\nquery_cache_size                = 0\nquery_cache_type                = 0\nexpire_logs_days                = 10\nmax_binlog_size                 = 100M\nmax_connections                 = 8192\nback_log                        = 4096\nopen_files_limit                = 20240\ninnodb_open_files               = 20240\nmax_connect_errors              = 3072\ntable_open_cache                = 4096\ntable_definition_cache          = 4096\ntmp_table_size                  = 1G\nmax_heap_table_size             = 1G\n\ninnodb_buffer_pool_size         = 10G\ninnodb_buffer_pool_instances    = 10\ninnodb_read_io_threads          = 64\ninnodb_write_io_threads         = 64\ninnodb_thread_concurrency       = 0\ninnodb_flush_log_at_trx_commit  = 0\ninnodb_flush_method             = O_DIRECT\nperformance_schema              = 0\ninnodb-file-per-table           = 1\ninnodb_io_capacity              = 20000\ninnodb_table_locks              = 0\ninnodb_lock_wait_timeout        = 0\n\nsql_mode                        = "NO_ENGINE_SUBSTITUTION"\n\n[mariadb]\n\nthread_cache_size               = 8192\nthread_handling                 = pool-of-threads\nthread_pool_size                = 12\nthread_pool_idle_timeout        = 20\nthread_pool_max_threads         = 1024\n\n[mysqldump]\nquick\nquote-names\nmax_allowed_packet              = 16M\n\n[mysql]\n\n[isamchk]\nkey_buffer_size                 = 16M'
 rConfig = '; XtreamCodes Configuration\n; -----------------\n; Your username and password will be encrypted and\n; saved to the \'credentials\' file in this folder\n; automatically.\n;\n; To change your username or password, modify BOTH\n; below and XtreamCodes will read and re-encrypt them.\n\n[XtreamCodes]\nhostname    =   "127.0.0.1"\ndatabase    =   "xtream_iptvpro"\nport        =   7999\nserver_id   =   1\n\n[Encrypted]\nusername    =   "%s"\npassword    =   "%s"'
 geoliteFiles = ["GeoLite2-City.mmdb", "GeoLite2-Country.mmdb", "GeoLite2-ASN.mmdb"]
 rSystemd = "[Unit]\nSourcePath=/home/xtreamcodes/service\nDescription=XtreamCodes Service\nAfter=network.target\nStartLimitIntervalSec=0\n\n[Service]\nType=simple\nUser=root\nRestart=always\nRestartSec=1\nExecStart=/bin/bash /home/xtreamcodes/service start\nExecReload=/bin/bash /home/xtreamcodes/service restart\nExecStop=/bin/bash /home/xtreamcodes/service stop\n\n[Install]\nWantedBy=multi-user.target"

@@ -299,8 +299,8 @@ if __name__ == "__main__":
         % rExtra
     )
     os.system(
-        "mysql -u root%s -e \"USE xtream_iptvpro; UPDATE settings SET live_streaming_pass = '%s', unique_id = '%s', crypt_load_balancing = '%s';\" > /dev/null"
-        % (rExtra, generate(20), generate(10), generate(20))
+        "mysql -u root%s -e \"USE xtream_iptvpro; UPDATE settings SET live_streaming_pass = '%s', unique_id = '%s';\" > /dev/null"
+        % (rExtra, generate(20), generate(10))
     )
     os.system(
         "sudo mysql -u root%s -e \"CREATE USER '%s'@'localhost' IDENTIFIED BY '%s';\""

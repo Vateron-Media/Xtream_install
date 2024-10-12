@@ -299,11 +299,11 @@ if __name__ == "__main__":
         % rExtra
     )
     os.system(
-        "mysql -u root%s -e \"USE xtream_iptvpro; UPDATE `settings` SET `value` = '%s' WHERE `name` = 'live_streaming_pass';\" > /dev/null"
+        "mysql -u root%s -e \"USE xtream_iptvpro; UPDATE settings SET value = '%s' WHERE name = 'live_streaming_pass';\" > /dev/null"
         % (rExtra, generate(20))
     )
     os.system(
-        "mysql -u root%s -e \"USE xtream_iptvpro; UPDATE `settings` SET `value` = '%s' WHERE `name` = 'unique_id';\" > /dev/null"
+        "mysql -u root%s -e \"USE xtream_iptvpro; UPDATE settings SET value = '%s' WHERE name = 'unique_id';\" > /dev/null"
         % (rExtra, generate(10))
     )
     os.system(

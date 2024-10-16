@@ -21,6 +21,8 @@ Update your ubuntu first, then install panel
 
 ```sudo apt update && sudo apt full-upgrade -y```
 
+```pip3 intall -r requirements.txt```
+
 ```rm install.py; wget https://raw.githubusercontent.com/Vateron-Media/Xtream_install/main/install.py;```
 
 ```sudo python3 install.py```

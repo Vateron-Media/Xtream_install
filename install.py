@@ -423,11 +423,12 @@ if __name__ == "__main__":
     if not os.path.exists("/home/xtreamcodes/content/streams"):
         os.mkdir("/home/xtreamcodes/content/streams")
 
+    os.system("sleep 2 && sudo /home/xtreamcodes/permissions.sh > /dev/null")
+
     os.system("sudo mount -a  >/dev/null 2>&1")
     os.system(
         "sudo chown xtreamcodes:xtreamcodes -R /home/xtreamcodes > /dev/null 2>&1"
     )
-    os.system("sleep 2 && sudo /home/xtreamcodes/permissions.sh > /dev/null")
     os.system("sudo systemctl daemon-reload")
     os.system("sudo systemctl start xtreamcodes")
 

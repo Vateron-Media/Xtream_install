@@ -1,9 +1,7 @@
 #!/usr/bin/python3
-# -*- coding: utf-8 -*-
 import io
 import os
 import random
-import shutil
 import socket
 import subprocess
 import sys
@@ -11,6 +9,10 @@ import time
 from urllib.parse import urlparse
 
 import requests
+
+if sys.version_info.major != 3:
+    print("Please run with python3.")
+    sys.exit(1)
 
 
 def get_recent_stable_release():
@@ -40,19 +42,21 @@ rPackages = [
     "dirmngr",
     "gpg-agent",
     "software-properties-common",
+    "libmaxminddb0",
+    "libmaxminddb-dev",
+    "mmdb-bin",
     "libcurl4",
-    "libcurl4-gnu-utls",
-    "libxslt1-dev",
     "libgeoip-dev",
+    "libxslt1-dev",
     "libonig-dev",
     "e2fsprogs",
     "wget",
+    "mariadb-server",
     "sysstat",
     "alsa-utils",
     "v4l-utils",
     "mcrypt",
-    "nscd",
-    "htop",
+    "certbot",
     "iptables-persistent",
     "libjpeg-dev",
     "libpng-dev",
@@ -60,20 +64,16 @@ rPackages = [
     "xz-utils",
     "zip",
     "unzip",
-    "mc",
-    "libpng16-16",
-    "libzip5",
-    "mariadb-server",
-    "rsync",
-    "libmaxminddb0",
-    "libmaxminddb-dev",
 ]
+
 rRemove = ["mysql-server"]
-rMySQLCnf = '# Xtream Codes\n[client]\nport                            = 3306\n\n[mysqld_safe]\nnice                            = 0\n\n[mysqld]\nuser                            = mysql\nport                            = 7999\nbasedir                         = /usr\ndatadir                         = /var/lib/mysql\ntmpdir                          = /tmp\nlc-messages-dir                 = /usr/share/mysql\nskip-external-locking\nskip-name-resolve\nbind-address                    = *\n\nkey_buffer_size                 = 128M\nmyisam_sort_buffer_size         = 4M\nmax_allowed_packet              = 64M\nmyisam-recover-options          = BACKUP\nmax_length_for_sort_data        = 8192\nquery_cache_limit               = 0\nquery_cache_size                = 0\nquery_cache_type                = 0\nexpire_logs_days                = 10\nmax_binlog_size                 = 100M\nmax_connections                 = 8192\nback_log                        = 4096\nopen_files_limit                = 20240\ninnodb_open_files               = 20240\nmax_connect_errors              = 3072\ntable_open_cache                = 4096\ntable_definition_cache          = 4096\ntmp_table_size                  = 1G\nmax_heap_table_size             = 1G\n\ninnodb_buffer_pool_size         = 10G\ninnodb_buffer_pool_instances    = 10\ninnodb_read_io_threads          = 64\ninnodb_write_io_threads         = 64\ninnodb_thread_concurrency       = 0\ninnodb_flush_log_at_trx_commit  = 0\ninnodb_flush_method             = O_DIRECT\nperformance_schema              = 0\ninnodb-file-per-table           = 1\ninnodb_io_capacity              = 20000\ninnodb_table_locks              = 0\ninnodb_lock_wait_timeout        = 0\n\nsql_mode                        = "NO_ENGINE_SUBSTITUTION"\n\n[mariadb]\n\nthread_cache_size               = 8192\nthread_handling                 = pool-of-threads\nthread_pool_size                = 12\nthread_pool_idle_timeout        = 20\nthread_pool_max_threads         = 1024\n\n[mysqldump]\nquick\nquote-names\nmax_allowed_packet              = 16M\n\n[mysql]\n\n[isamchk]\nkey_buffer_size                 = 16M'
-rConfig = '; XtreamCodes Configuration\n; -----------------\n; Your username and password will be encrypted and\n; saved to the \'credentials\' file in this folder\n; automatically.\n;\n; To change your username or password, modify BOTH\n; below and XtreamCodes will read and re-encrypt them.\n\n[XtreamCodes]\nhostname    =   "127.0.0.1"\ndatabase    =   "xtream_iptvpro"\nport        =   7999\nserver_id   =   1\n\n[Encrypted]\nusername    =   "%s"\npassword    =   "%s"'
 geoliteFiles = ["GeoLite2-City.mmdb", "GeoLite2-Country.mmdb", "GeoLite2-ASN.mmdb"]
-rSystemd = "[Unit]\nSourcePath=/home/xtreamcodes/service\nDescription=XtreamCodes Service\nAfter=network.target\nStartLimitIntervalSec=0\n\n[Service]\nType=simple\nUser=root\nRestart=always\nRestartSec=1\nExecStart=/bin/bash /home/xtreamcodes/service start\nExecReload=/bin/bash /home/xtreamcodes/service restart\nExecStop=/bin/bash /home/xtreamcodes/service stop\n\n[Install]\nWantedBy=multi-user.target"
-rSysCtl = "# XtreamCodes\n\nnet.ipv4.tcp_congestion_control = bbr\nnet.core.default_qdisc = fq\nnet.ipv4.tcp_rmem = 8192 87380 134217728\nnet.ipv4.udp_rmem_min = 16384\nnet.core.rmem_default = 262144\nnet.core.rmem_max = 268435456\nnet.ipv4.tcp_wmem = 8192 65536 134217728\nnet.ipv4.udp_wmem_min = 16384\nnet.core.wmem_default = 262144\nnet.core.wmem_max = 268435456\nnet.core.somaxconn = 1000000\nnet.core.netdev_max_backlog = 250000\nnet.core.optmem_max = 65535\nnet.ipv4.tcp_max_tw_buckets = 1440000\nnet.ipv4.tcp_max_orphans = 16384\nnet.ipv4.ip_local_port_range = 2000 65000\nnet.ipv4.tcp_no_metrics_save = 1\nnet.ipv4.tcp_slow_start_after_idle = 0\nnet.ipv4.tcp_fin_timeout = 15\nnet.ipv4.tcp_keepalive_time = 300\nnet.ipv4.tcp_keepalive_probes = 5\nnet.ipv4.tcp_keepalive_intvl = 15\nfs.file-max=20970800\nfs.nr_open=20970800\nfs.aio-max-nr=20970800\nnet.ipv4.tcp_timestamps = 1\nnet.ipv4.tcp_window_scaling = 1\nnet.ipv4.tcp_mtu_probing = 1\nnet.ipv4.route.flush = 1\nnet.ipv6.route.flush = 1"
+
+rMySQLCnf = '# XC_VM\n[client]\nport                            = 3306\n\n[mysqld_safe]\nnice                            = 0\n\n[mysqld]\nuser                            = mysql\nport                            = 7999\nbasedir                         = /usr\ndatadir                         = /var/lib/mysql\ntmpdir                          = /tmp\nlc-messages-dir                 = /usr/share/mysql\nskip-external-locking\nskip-name-resolve\nbind-address                    = *\n\nkey_buffer_size                 = 128M\nmyisam_sort_buffer_size         = 4M\nmax_allowed_packet              = 64M\nmyisam-recover-options          = BACKUP\nmax_length_for_sort_data        = 8192\nquery_cache_limit               = 0\nquery_cache_size                = 0\nquery_cache_type                = 0\nexpire_logs_days                = 10\nmax_binlog_size                 = 100M\nmax_connections                 = 8192\nback_log                        = 4096\nopen_files_limit                = 20240\ninnodb_open_files               = 20240\nmax_connect_errors              = 3072\ntable_open_cache                = 4096\ntable_definition_cache          = 4096\ntmp_table_size                  = 1G\nmax_heap_table_size             = 1G\n\ninnodb_buffer_pool_size         = 10G\ninnodb_buffer_pool_instances    = 10\ninnodb_read_io_threads          = 64\ninnodb_write_io_threads         = 64\ninnodb_thread_concurrency       = 0\ninnodb_flush_log_at_trx_commit  = 0\ninnodb_flush_method             = O_DIRECT\nperformance_schema              = 0\ninnodb-file-per-table           = 1\ninnodb_io_capacity              = 20000\ninnodb_table_locks              = 0\ninnodb_lock_wait_timeout        = 0\n\nsql_mode                        = "NO_ENGINE_SUBSTITUTION"\n\n[mariadb]\n\nthread_cache_size               = 8192\nthread_handling                 = pool-of-threads\nthread_pool_size                = 12\nthread_pool_idle_timeout        = 20\nthread_pool_max_threads         = 1024\n\n[mysqldump]\nquick\nquote-names\nmax_allowed_packet              = 16M\n\n[mysql]\n\n[isamchk]\nkey_buffer_size                 = 16M'
+rConfig = '; XC_VM Configuration\n; -----------------\n; Your username and password will be encrypted and\n; saved to the \'credentials\' file in this folder\n; automatically.\n;\n; To change your username or password, modify BOTH\n; below and XC_VM will read and re-encrypt them.\n\n[XC_VM]\nhostname    =   "127.0.0.1"\ndatabase    =   "xc_vm"\nport        =   7999\nserver_id   =   1\n\n[Encrypted]\nusername    =   "%s"\npassword    =   "%s"'
+rSystemd = "[Unit]\nSourcePath=/home/xtreamcodes/service\nDescription=XC_VM Service\nAfter=network.target\nStartLimitIntervalSec=0\n\n[Service]\nType=simple\nUser=root\nRestart=always\nRestartSec=1\nExecStart=/bin/bash /home/xtreamcodes/service start\nExecRestart=/bin/bash /home/xtreamcodes/service restart\nExecStop=/bin/bash /home/xtreamcodes/service stop\n\n[Install]\nWantedBy=multi-user.target"
+rRedisConfig = 'bind *\nprotected-mode yes\nport 6379\ntcp-backlog 511\ntimeout 0\ntcp-keepalive 300\ndaemonize yes\nsupervised no\npidfile /home/xtreamcodes/bin/redis/redis-server.pid\nloglevel warning\nlogfile /home/xtreamcodes/bin/redis/redis-server.log\ndatabases 1\nalways-show-logo yes\nstop-writes-on-bgsave-error no\nrdbcompression no\nrdbchecksum no\ndbfilename dump.rdb\ndir /home/xtreamcodes/bin/redis/\nslave-serve-stale-data yes\nslave-read-only yes\nrepl-diskless-sync no\nrepl-diskless-sync-delay 5\nrepl-disable-tcp-nodelay no\nslave-priority 100\nrequirepass #PASSWORD#\nmaxclients 655350\nlazyfree-lazy-eviction no\nlazyfree-lazy-expire no\nlazyfree-lazy-server-del no\nslave-lazy-flush no\nappendonly no\nappendfilename "appendonly.aof"\nappendfsync everysec\nno-appendfsync-on-rewrite no\nauto-aof-rewrite-percentage 100\nauto-aof-rewrite-min-size 64mb\naof-load-truncated yes\naof-use-rdb-preamble no\nlua-time-limit 5000\nslowlog-log-slower-than 10000\nslowlog-max-len 128\nlatency-monitor-threshold 0\nnotify-keyspace-events ""\nhash-max-ziplist-entries 512\nhash-max-ziplist-value 64\nlist-max-ziplist-size -2\nlist-compress-depth 0\nset-max-intset-entries 512\nzset-max-ziplist-entries 128\nzset-max-ziplist-value 64\nhll-sparse-max-bytes 3000\nactiverehashing yes\nclient-output-buffer-limit normal 0 0 0\nclient-output-buffer-limit slave 256mb 64mb 60\nclient-output-buffer-limit pubsub 32mb 8mb 60\nhz 10\naof-rewrite-incremental-fsync yes\nsave 60 1000\nserver-threads 4\nserver-thread-affinity true'
+rSysCtl = "# XC_VM\n\nnet.ipv4.tcp_congestion_control = bbr\nnet.core.default_qdisc = fq\nnet.ipv4.tcp_rmem = 8192 87380 134217728\nnet.ipv4.udp_rmem_min = 16384\nnet.core.rmem_default = 262144\nnet.core.rmem_max = 268435456\nnet.ipv4.tcp_wmem = 8192 65536 134217728\nnet.ipv4.udp_wmem_min = 16384\nnet.core.wmem_default = 262144\nnet.core.wmem_max = 268435456\nnet.core.somaxconn = 1000000\nnet.core.netdev_max_backlog = 250000\nnet.core.optmem_max = 65535\nnet.ipv4.tcp_max_tw_buckets = 1440000\nnet.ipv4.tcp_max_orphans = 16384\nnet.ipv4.ip_local_port_range = 2000 65000\nnet.ipv4.tcp_no_metrics_save = 1\nnet.ipv4.tcp_slow_start_after_idle = 0\nnet.ipv4.tcp_fin_timeout = 15\nnet.ipv4.tcp_keepalive_time = 300\nnet.ipv4.tcp_keepalive_probes = 5\nnet.ipv4.tcp_keepalive_intvl = 15\nfs.file-max=20970800\nfs.nr_open=20970800\nfs.aio-max-nr=20970800\nnet.ipv4.tcp_timestamps = 1\nnet.ipv4.tcp_window_scaling = 1\nnet.ipv4.tcp_mtu_probing = 1\nnet.ipv4.route.flush = 1\nnet.ipv6.route.flush = 1"
 Choice = "23456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ"
 
 rVersions = {
@@ -93,7 +93,6 @@ class col:
     OKGREEN = "\033[92m"
     WARNING = "\033[93m"
     FAIL = "\033[91m"
-    YELLOW = "\033[33m"
     ENDC = "\033[0m"
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
@@ -138,6 +137,7 @@ if __name__ == "__main__":
     ##################################################
     # START                                          #
     ##################################################
+
     try:
         rVersion = os.popen("lsb_release -sr").read().strip()
     except:
@@ -146,16 +146,16 @@ if __name__ == "__main__":
         printc("Unsupported Operating System")
         sys.exit(1)
 
-    printc("XtreamUI Ubuntu - Moded Divarion-D", col.OKGREEN, 2)
+    printc("XC_VM", col.OKGREEN, 2)
     rHost = "127.0.0.1"
     rServerID = 1
-    rUsername = "user_iptvpro"
+    rUsername = generate()
     rPassword = generate()
-    rDatabase = "xtream_iptvpro"
+    rDatabase = "xc_vm"
     rPort = 7999
 
     if os.path.exists("/home/xtreamcodes/"):
-        printc("XtreamCodes Directory Exists!")
+        printc("XC_VM Directory Exists!")
         while True:
             rAnswer = input("Continue and overwrite? (Y / N) : ")
             if rAnswer.upper() in ["Y", "N"]:
@@ -172,25 +172,16 @@ if __name__ == "__main__":
         "/var/lib/dpkg/lock-frontend",
         "/var/cache/apt/archives/lock",
         "/var/lib/dpkg/lock",
+        "/var/lib/apt/lists/lock",
     ]:
         if os.path.exists(rFile):
             try:
                 os.remove(rFile)
             except:
                 pass
-
-    if os.path.isfile("/home/xtreamcodes/config"):
-        shutil.copyfile("/home/xtreamcodes/config", "/tmp/config.xtmp")
-    # for geoliteFile in geoliteFiles:
-    #     if os.path.isfile(f"/home/xtreamcodes/bin/maxmind/{geoliteFile}"):
-    #         os.system(
-    #             f"chattr -i /home/xtreamcodes/bin/maxmind/{geoliteFile} > /dev/null"
-    #         )
-
     printc("Updating system")
-
-    os.system("apt-get update")
-    os.system("apt-get -y full-upgrade")
+    os.system("sudo apt-get update")
+    os.system("sudo apt-get -y full-upgrade")
     os.system(
         "sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install software-properties-common"
     )
@@ -203,55 +194,38 @@ if __name__ == "__main__":
             "sudo add-apt-repository -y 'deb [arch=amd64,arm64,ppc64el] http://ams2.mirrors.digitalocean.com/mariadb/repo/10.6/ubuntu %s main'"
             % rVersions[rVersion]
         )
-    os.system("apt-get update > /dev/null")
+    os.system("sudo apt-get update")
     for rPackage in rRemove:
         printc("Removing %s" % rPackage)
         os.system("sudo apt-get remove %s -y" % rPackage)
-
     for rPackage in rPackages:
         printc("Installing %s" % rPackage)
         os.system(
             "sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install %s" % rPackage
         )
-    printc("Installing pip3")
-    os.system(
-        "add-apt-repository universe > /dev/null 2>&1 && curl https://bootstrap.pypa.io/get-pip.py --output get-pip.py > /dev/null 2>&1 && python3 get-pip.py > /dev/null 2>&1"
-    )
-    printc("Installing pip modules")
-    os.system(
-        "pip3 install ndg-httpsclient > /dev/null 2>&1 && pip3 install pyopenssl > /dev/null 2>&1 && pip3 install pyasn1 > /dev/null 2>&1"
-    )
-
     try:
-        subprocess.check_output("getent passwd xtreamcodes > /dev/null".split())
+        subprocess.check_output("getent passwd xtreamcodes".split())
     except:
-        # Create User
-        printc("Creating user xtreamcodes")
+        printc("Creating user")
         os.system(
-            "adduser --system --shell /bin/false --group --disabled-login xtreamcodes > /dev/null"
+            "sudo adduser --system --shell /bin/false --group --disabled-login xtreamcodes"
         )
-
     if not os.path.exists("/home/xtreamcodes"):
         os.mkdir("/home/xtreamcodes")
 
     ##################################################
     # INSTALL                                        #
     ##################################################
-
     printc("Downloading Software")
     os.system('wget -q -O "/tmp/xtreamcodes.tar.gz" "%s"' % rDownloadURL)
     if os.path.exists("/tmp/xtreamcodes.tar.gz"):
-        printc("Installing Software")
-        os.system(
-            'tar -xvf "/tmp/xtreamcodes.tar.gz" -C "/home/xtreamcodes/" > /dev/null'
-        )
-        try:
-            os.remove("/tmp/xtreamcodes.tar.gz")
-        except:
-            pass
+        printc("Installing XC_VM")
+        if os.path.exists("/tmp/xtreamcodes.tar.gz"):
+            os.system(
+                'sudo tar -zxvf "/tmp/xtreamcodes.tar.gz" -C "/home/xtreamcodes/"'
+            )
         if not os.path.exists("/home/xtreamcodes/status"):
             printc("Failed to extract! Exiting")
-            sys.exit(1)
     else:
         printc("Download failed", col.FAIL)
         sys.exit(1)
@@ -263,15 +237,13 @@ if __name__ == "__main__":
     printc("Configuring MySQL")
     rCreate = True
     if os.path.exists("/etc/mysql/my.cnf"):
-        if open("/etc/mysql/my.cnf", "r").read(14) == "# Xtream Codes":
+        if open("/etc/mysql/my.cnf", "r").read(5) == "# XC_VM":
             rCreate = False
     if rCreate:
-        shutil.copy("/etc/mysql/my.cnf", "/etc/mysql/my.cnf.xc")
-        rFile = open("/etc/mysql/my.cnf", "w")
+        rFile = io.open("/etc/mysql/my.cnf", "w", encoding="utf-8")
         rFile.write(rMySQLCnf)
         rFile.close()
         os.system("sudo service mariadb restart")
-
     rExtra = ""
     rRet = os.system('mysql -u root -e "SELECT VERSION();"')
     if rRet != 0:
@@ -282,37 +254,28 @@ if __name__ == "__main__":
                 break
             else:
                 printc("Invalid password! Please try again.")
-
     os.system(
-        'sudo mysql -u root%s -e "DROP DATABASE IF EXISTS xtream_iptvpro; CREATE DATABASE IF NOT EXISTS xtream_iptvpro;"'
+        'sudo mysql -u root%s -e "DROP DATABASE IF EXISTS xc_vm; CREATE DATABASE IF NOT EXISTS xc_vm;"'
         % rExtra
     )
     os.system(
-        'sudo mysql -u root%s xtream_iptvpro < "/home/xtreamcodes/database.sql"'
+        'sudo mysql -u root%s -e "DROP DATABASE IF EXISTS xc_vm_migrate; CREATE DATABASE IF NOT EXISTS xc_vm_migrate;"'
         % rExtra
     )
     os.system(
-        "sudo mysql -u root%s -e \"USE xtream_iptvpro; REPLACE INTO reg_users (id, username, password, email, member_group_id, verified, status) VALUES (1, 'admin', '\$6\$rounds=20000\$xtreamcodes\$XThC5OwfuS0YwS4ahiifzF14vkGbGsFF1w7ETL4sRRC5sOrAWCjWvQJDromZUQoQuwbAXAFdX3h3Cp3vqulpS0', 'admin@website.com', 1, 1, 1);\" > /dev/null"
+        'sudo mysql -u root%s xc_vm < "/home/xtreamcodes/bin/install/database.sql"'
         % rExtra
-    )
-    os.system(
-        "sudo mysql -u root%s -e \"USE xtream_iptvpro; CREATE TABLE IF NOT EXISTS dashboard_statistics (id int(11) NOT NULL AUTO_INCREMENT, type varchar(16) NOT NULL DEFAULT '', time int(16) NOT NULL DEFAULT '0', count int(16) NOT NULL DEFAULT '0', PRIMARY KEY (id)) ENGINE=InnoDB DEFAULT CHARSET=latin1; INSERT INTO dashboard_statistics (type, time, count) VALUES('conns', UNIX_TIMESTAMP(), 0),('users', UNIX_TIMESTAMP(), 0);\" > /dev/null"
-        % rExtra
-    )
-    os.system(
-        "mysql -u root%s -e \"USE xtream_iptvpro; UPDATE settings SET value = '%s' WHERE name = 'live_streaming_pass';\" > /dev/null"
-        % (rExtra, generate(20))
-    )
-    os.system(
-        "mysql -u root%s -e \"USE xtream_iptvpro; UPDATE settings SET value = '%s' WHERE name = 'unique_id';\" > /dev/null"
-        % (rExtra, generate(10))
     )
     os.system(
         "sudo mysql -u root%s -e \"CREATE USER '%s'@'localhost' IDENTIFIED BY '%s';\""
         % (rExtra, rUsername, rPassword)
     )
     os.system(
-        "sudo mysql -u root%s -e \"GRANT ALL PRIVILEGES ON xtream_iptvpro.* TO '%s'@'localhost';\""
+        "sudo mysql -u root%s -e \"GRANT ALL PRIVILEGES ON xc_vm.* TO '%s'@'localhost';\""
+        % (rExtra, rUsername)
+    )
+    os.system(
+        "sudo mysql -u root%s -e \"GRANT ALL PRIVILEGES ON xc_vm_migrate.* TO '%s'@'localhost';\""
         % (rExtra, rUsername)
     )
     os.system(
@@ -320,7 +283,7 @@ if __name__ == "__main__":
         % (rExtra, rUsername)
     )
     os.system(
-        "sudo mysql -u root%s -e \"GRANT GRANT OPTION ON xtream_iptvpro.* TO '%s'@'localhost';\""
+        "sudo mysql -u root%s -e \"GRANT GRANT OPTION ON xc_vm.* TO '%s'@'localhost';\""
         % (rExtra, rUsername)
     )
     os.system(
@@ -328,23 +291,22 @@ if __name__ == "__main__":
         % (rExtra, rUsername, rPassword)
     )
     os.system(
-        "sudo mysql -u root%s -e \"GRANT ALL PRIVILEGES ON xtream_iptvpro.* TO '%s'@'127.0.0.1';\""
+        "sudo mysql -u root%s -e \"GRANT ALL PRIVILEGES ON xc_vm.* TO '%s'@'127.0.0.1';\""
         % (rExtra, rUsername)
     )
-
+    os.system(
+        "sudo mysql -u root%s -e \"GRANT ALL PRIVILEGES ON xc_vm_migrate.* TO '%s'@'127.0.0.1';\""
+        % (rExtra, rUsername)
+    )
     os.system(
         "sudo mysql -u root%s -e \"GRANT ALL PRIVILEGES ON mysql.* TO '%s'@'127.0.0.1';\""
         % (rExtra, rUsername)
     )
     os.system(
-        "sudo mysql -u root%s -e \"GRANT GRANT OPTION ON xtream_iptvpro.* TO '%s'@'127.0.0.1';\""
+        "sudo mysql -u root%s -e \"GRANT GRANT OPTION ON xc_vm.* TO '%s'@'127.0.0.1';\""
         % (rExtra, rUsername)
     )
-    os.remove("/home/xtreamcodes/database.sql")
-
-    # if not folder config
-    if not os.path.exists("/home/xtreamcodes/config"):
-        os.mkdir("/home/xtreamcodes/config")
+    os.system('sudo mysql -u root%s -e "FLUSH PRIVILEGES;"' % rExtra)
     rConfigData = rConfig % (rUsername, rPassword)
     rFile = io.open("/home/xtreamcodes/config/config.ini", "w", encoding="utf-8")
     rFile.write(rConfigData)
@@ -358,16 +320,13 @@ if __name__ == "__main__":
     if not "/home/xtreamcodes/" in open("/etc/fstab").read():
         rFile = io.open("/etc/fstab", "a", encoding="utf-8")
         rFile.write(
-            "tmpfs /home/xtreamcodes/content/streams tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=90% 0 0\ntmpfs /home/xtreamcodes/tmp tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=6G 0 0"
+            "\ntmpfs /home/xtreamcodes/content/streams tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=90% 0 0\ntmpfs /home/xtreamcodes/tmp tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=6G 0 0"
         )
         rFile.close()
-    if not "xtreamcodes" in open("/etc/sudoers").read():
-        os.system(
-            'echo "xtreamcodes ALL = (root) NOPASSWD: /sbin/iptables, /usr/bin/chattr, /usr/bin/python3, /usr/bin/python" >> /etc/sudoers'
-        )
     if os.path.exists("/etc/init.d/xtreamcodes"):
         os.remove("/etc/init.d/xtreamcodes")
-
+    if os.path.exists("/etc/systemd/system/xtreamcodes.service"):
+        os.remove("/etc/systemd/system/xtreamcodes.service")
     if not os.path.exists("/etc/systemd/system/xtreamcodes.service"):
         rFile = io.open(
             "/etc/systemd/system/xtreamcodes.service", "w", encoding="utf-8"
@@ -407,23 +366,14 @@ if __name__ == "__main__":
             'sudo echo "\nDefaultLimitNOFILE=655350" >> "/etc/systemd/system.conf"'
         )
         os.system('sudo echo "\nDefaultLimitNOFILE=655350" >> "/etc/systemd/user.conf"')
+    if not os.path.exists("/home/xtreamcodes/bin/redis/redis.conf"):
+        rFile = io.open("/home/xtreamcodes/bin/redis/redis.conf", "w", encoding="utf-8")
+        rFile.write(rRedisConfig)
+        rFile.close()
 
     ##################################################
     # FINISHED                                       #
     ##################################################
-
-    if not os.path.exists("/home/xtreamcodes/tmp"):
-        os.mkdir("/home/xtreamcodes/tmp")
-
-    if not os.path.exists("/home/xtreamcodes/logs"):
-        os.mkdir("/home/xtreamcodes/logs")
-
-    if not os.path.exists("/home/xtreamcodes/content"):
-        os.mkdir("/home/xtreamcodes/content")
-
-    if not os.path.exists("/home/xtreamcodes/content/streams"):
-        os.mkdir("/home/xtreamcodes/content/streams")
-
     os.system("sleep 2 && sudo /home/xtreamcodes/permissions.sh > /dev/null")
 
     os.system("sudo mount -a  >/dev/null 2>&1")
@@ -436,27 +386,17 @@ if __name__ == "__main__":
     time.sleep(10)
     os.system("sudo /home/xtreamcodes/status 1")
     os.system(
-        "sudo /home/xtreamcodes/bin/php/bin/php /home/xtreamcodes/tools/startup.php >/dev/null 2>&1"
+        "sudo /home/xtreamcodes/bin/php/bin/php /home/xtreamcodes/includes/cli_tool/startup.php >/dev/null 2>&1"
     )
-    # for geoliteFile in geoliteFiles:
-    #     if os.path.isfile(f"/home/xtreamcodes/bin/maxmind/{geoliteFile}"):
-    #         os.system(
-    #             f"chattr +i /home/xtreamcodes/bin/maxmind/{geoliteFile} > /dev/null"
-    #         )
 
     rFile = io.open(rPath + "/credentials.txt", "w", encoding="utf-8")
     rFile.write("MySQL Username: %s\nMySQL Password: %s" % (rUsername, rPassword))
     rFile.close()
 
     printc("Installation completed!", col.OKGREEN, 2)
+    printc("Continue Setup: http://%s:25500" % getIP())
     print(" ")
     printc("Your mysql credentials have been saved to:")
     printc(rPath + "/credentials.txt")
     print(" ")
     printc("Please move this file somewhere safe!")
-    print(" ")
-    printc("Admin UI: http://%s:25500" % getIP())
-    printc("Admin UI default login is admin/admin")
-
-    # crutch, for some reason the cache folder is not getting the correct access rights
-    os.system("sudo systemctl restart xtreamcodes")

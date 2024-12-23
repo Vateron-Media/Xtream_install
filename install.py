@@ -15,23 +15,40 @@ if sys.version_info.major != 3:
     sys.exit(1)
 
 
-def get_recent_stable_release():
-    url = "https://github.com/Vateron-Media/Xtream_main/releases/latest"
+def get_github_releases():
+    """
+    Получает последний релиз и пререлиз с GitHub.
+
+    :param repo: Репозиторий в формате "owner/repo", например "torvalds/linux".
+    :return: Словарь с информацией о релизе и пререлизе.
+    """
+    base_url = "https://api.github.com/repos/Vateron-Media/Xtream_main/releases"
+
     try:
-        response = requests.get(url, allow_redirects=True)
-        final_url = response.url
-        version = os.path.basename(urlparse(final_url).path)
+        response = requests.get(base_url)
+        response.raise_for_status()
 
-        if not version:
-            return None
+        releases = response.json()
+        if not releases:
+            return {"error": "No releases found"}
 
-        return version
-    except requests.RequestException:
-        return None
+        latest_release = next((r for r in releases if not r.get("prerelease")), None)
+        latest_prerelease = next((r for r in releases if r.get("prerelease")), None)
+
+        return {
+            "latest_release": latest_release["tag_name"] if latest_release else None,
+            "latest_prerelease": (
+                latest_prerelease["tag_name"] if latest_prerelease else None
+            ),
+        }
+
+    except requests.exceptions.RequestException as e:
+        return {"error": f"Request failed: {e}"}
 
 
-Version_main = get_recent_stable_release()
-rDownloadURL = f"https://github.com/Vateron-Media/Xtream_main/releases/download/{Version_main}/main_xui.tar.gz"
+releases = get_github_releases()
+rDownloadURL = f"https://github.com/Vateron-Media/Xtream_main/releases/download/{releases.get('latest_release')}/main_xui.tar.gz"
+bDownloadURL = f"https://github.com/Vateron-Media/Xtream_main/releases/download/{releases.get('latest_prerelease')}/main_xui.tar.gz"
 
 rPath = os.path.dirname(os.path.realpath(__file__))
 rPackages = [
@@ -138,6 +155,21 @@ if __name__ == "__main__":
     # START                                          #
     ##################################################
 
+    printc("Please select the version")
+    printc(
+        f"Stable version: {releases.get('latest_release')} Beta version: {releases.get('latest_prerelease')}"
+    )
+
+    while True:
+        rAnswer = input("Install Stable or Beta? (S / B) : ")
+        if rAnswer.upper() in ["S", "B"]:
+            break
+
+    if rAnswer.upper() == "B":
+        ReleaseURL = bDownloadURL
+    else:
+        ReleaseURL = rDownloadURL
+
     try:
         rVersion = os.popen("lsb_release -sr").read().strip()
     except:
@@ -217,7 +249,7 @@ if __name__ == "__main__":
     # INSTALL                                        #
     ##################################################
     printc("Downloading Software")
-    os.system('wget -q -O "/tmp/xtreamcodes.tar.gz" "%s"' % rDownloadURL)
+    os.system('wget -q -O "/tmp/xtreamcodes.tar.gz" "%s"' % ReleaseURL)
     if os.path.exists("/tmp/xtreamcodes.tar.gz"):
         printc("Installing XC_VM")
         if os.path.exists("/tmp/xtreamcodes.tar.gz"):

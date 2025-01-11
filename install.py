@@ -6,7 +6,6 @@ import socket
 import subprocess
 import sys
 import time
-from urllib.parse import urlparse
 
 import requests
 
@@ -17,10 +16,9 @@ if sys.version_info.major != 3:
 
 def get_github_releases():
     """
-    Получает последний релиз и пререлиз с GitHub.
+    Gets the latest release and prerelease from GitHub.
 
-    :param repo: Репозиторий в формате "owner/repo", например "torvalds/linux".
-    :return: Словарь с информацией о релизе и пререлизе.
+    :return: A dictionary with information about the release and prerelease.
     """
     base_url = "https://api.github.com/repos/Vateron-Media/Xtream_main/releases"
 
@@ -157,7 +155,7 @@ if __name__ == "__main__":
 
     printc("Please select the version")
     printc(
-        f"Stable version: {releases.get('latest_release')} Beta version: {releases.get('latest_prerelease')}"
+        f"Stable version (not suport): {releases.get('latest_release')} Beta version: {releases.get('latest_prerelease')}"
     )
 
     while True:

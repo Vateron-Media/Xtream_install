@@ -23,6 +23,8 @@ Update your ubuntu first, then install panel
 
 ```sudo apt install python3-pip```
 
+```sudo apt install git```
+
 ```git clone https://github.com/Vateron-Media/Xtream_install```
 
 ```cd Xtream_install/```

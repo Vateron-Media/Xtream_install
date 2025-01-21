@@ -92,8 +92,6 @@ rSysCtl = "# XC_VM\n\nnet.ipv4.tcp_congestion_control = bbr\nnet.core.default_qd
 Choice = "23456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ"
 
 rVersions = {
-    "14.04": "trusty",
-    "16.04": "xenial",
     "18.04": "bionic",
     "20.04": "focal",
     "20.10": "groovy",

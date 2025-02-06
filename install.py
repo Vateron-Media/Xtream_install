@@ -402,9 +402,8 @@ if __name__ == "__main__":
     ##################################################
     # FINISHED                                       #
     ##################################################
-    os.system("sleep 2 && sudo /home/xtreamcodes/permissions.sh > /dev/null")
 
-    os.system("sudo mount -a  >/dev/null 2>&1")
+    os.system("sleep 2 && sudo mount -a  >/dev/null 2>&1")
     os.system(
         "sudo chown xtreamcodes:xtreamcodes -R /home/xtreamcodes > /dev/null 2>&1"
     )

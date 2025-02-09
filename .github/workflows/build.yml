@@ -1,0 +1,43 @@
+name: Build and Release Xtream Install
+
+on:
+  push:
+    tags:
+      - "v*"  # Runs on tag fluff, e.g. "v1.0.0"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 python3-pip
+          pip install pyinstaller
+
+      - name: Build executable
+        run: |
+          pyinstaller --onefile --name xtream_install install.py
+          mv dist/xtream_install install  # Rename the file
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: install
+          path: install
+
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Xtream Install ${{ github.ref_name }}
+          body: "Automatically generated executable file for Xtream Install"
+          draft: false
+          prerelease: false
+          files: install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

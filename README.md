@@ -1,40 +1,51 @@
-# XtreamUI OpenSource
-[![Main version](https://img.shields.io/github/v/release/Vateron-Media/Xtream_main?label=Release%20Main&color=green)](https://github.com/Vateron-Media/Xtream_main/)
-[![Sub version](https://img.shields.io/github/v/release/Vateron-Media/Xtream_sub?label=Release%20Sub&color=green)](https://github.com/Vateron-Media/Xtream_sub/)
-![GitHub](https://img.shields.io/github/license/Vateron-Media/Xtream_install)
+# **XtreamUI OpenSource**  
+[![Main version](https://img.shields.io/github/v/release/Vateron-Media/Xtream_main?label=Main%20Release&color=green)](https://github.com/Vateron-Media/Xtream_main/)
+[![Sub version](https://img.shields.io/github/v/release/Vateron-Media/Xtream_lb?label=LB%20Release&color=blue)](https://github.com/Vateron-Media/Xtream_lb/)
+[![GitHub License](https://img.shields.io/github/license/Vateron-Media/Xtream_install)](LICENSE)
 
-All the code used in the Vateron-Media repository projects was found in the public domain on the Internet.
+XtreamUI OpenSource is a **community-driven** project based on publicly available source code. This panel is designed to provide powerful media streaming solutions.
 
-## Warning
-**The panel is currently in alpha test and therefore the panel may not work in some updates.**
-**At the moment SUB is not working or not working properly. Work with SUB will start after all global problems in MAIN have been resolved**
+---
 
-## Repositories 
-[MAIN](https://github.com/Vateron-Media/Xtream_main) - XtreamUI Panel
+## 🚨 **Warning**
+🔴 **The panel is currently in ALPHA testing.**  
+🔴 **SUB (Balancer) is NOT fully operational and will be fixed after major MAIN panel issues are resolved.**  
 
-[SUB](https://github.com/Vateron-Media/Xtream_sub) - Balancer is not working
+---
 
-## How do I install?
-Currently supports LINUX 20
+## 📂 **Repositories**  
+| Repository | Description |
+|------------|-------------|
+| [🔹 MAIN](https://github.com/Vateron-Media/Xtream_main) | XtreamUI Panel |
+| [🔸 SUB](https://github.com/Vateron-Media/Xtream_lb) | Balancer (Currently non-functional) |
+| [⚙ BUILD](https://github.com/Vateron-Media/Xtream_build) | Auxiliary files for building releases and other stuff |
 
-Update your ubuntu first, then install panel
+---
 
-```sudo apt update && sudo apt full-upgrade -y```
+## 💾 **Installation Guide**
+✅ **Supported OS:** **Ubuntu 20.04+**  
 
-```sudo apt install python3-pip```
+### 1️⃣ **Update Your System**
+```sh
+sudo apt update && sudo apt full-upgrade -y
+```
 
-```sudo apt install git```
+### 2️⃣ **Install Dependencies**
+```sh
+sudo apt install -y python3-pip git
+```
 
-```git clone https://github.com/Vateron-Media/Xtream_install```
+### 3️⃣ **Clone and Run Installer**
+```sh
+git clone https://github.com/Vateron-Media/Xtream_install
+cd Xtream_install/
+pip3 install -r requirements.txt
+sudo python3 install.py
+```
 
-```cd Xtream_install/```
+---
 
-```pip3 install -r requirements.txt```
-
-```sudo python3 install.py```
-
-# Disclaimer
-**This project has been created for educational purposes.**
-
-**Please check the legal regulations in your country before using it.
-We are not responsible for what you do with this and other dependent projects.** 
+## ⚠ **Disclaimer**
+📌 **This project is for educational purposes only.**  
+📌 **Ensure compliance with legal regulations in your country before usage.**  
+📌 **We are NOT responsible for how this project is used.**  

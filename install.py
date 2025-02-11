@@ -153,7 +153,7 @@ if __name__ == "__main__":
 
     printc("Please select the version")
     printc(
-        f"Stable version (not suport): {releases.get('latest_release')} Beta version: {releases.get('latest_prerelease')}"
+        f"Stable version: {releases.get('latest_release')} Beta version: {releases.get('latest_prerelease')}"
     )
 
     while True:

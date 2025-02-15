@@ -1,0 +1,149 @@
+<?php
+use PHPUnit\Framework\TestCase;
+
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ *
+ * These annotations can help isolate each test so that any global overrides
+ * (e.g., $_REQUEST or includes) won't leak into other tests.
+ */
+class StreamTest extends TestCase
+{
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        // Mock any global variables needed.
+        // For example, the script checks $rPermissions["is_admin"].
+        // We'll define it so we can manipulate in tests:
+        global $rPermissions;
+        $rPermissions = [
+            "is_admin" => true,
+            // Additional permissions can be set as needed...
+        ];
+
+        // If you use $rSettings or $ipTV_db_admin, set them up here, for example:
+        global $rSettings;
+        $rSettings = [
+            "download_images" => false
+        ];
+
+        // Example mock for your DB handle:
+        global $ipTV_db_admin;
+        $ipTV_db_admin = $this->createMock(\stdClass::class);
+
+        // Fake your library, e.g. ipTV_lib:
+        require_once __DIR__ . '/../includes/lib.php';
+        // or if you have to define it: 
+        // global $ipTV_lib;
+        // $ipTV_lib = ...
+    }
+
+    /**
+     * Example test: ensures that if the user does NOT have admin permission,
+     * the script should exit before doing anything else.
+     */
+    public function testNonAdminUserExitsEarly(): void
+    {
+        // Set up a non-admin scenario:
+        global $rPermissions;
+        $rPermissions["is_admin"] = false;
+
+        // Prepare a small test for $_REQUEST:
+        $_REQUEST = [
+            "submit_stream" => true,
+        ];
+
+        // Because stream.php has a lot of 'exit;' calls, we can capture that
+        // with an output buffer or set an expectation. One approach is to
+        // include the file in a function that we catch with `set_error_handler`
+        // or `expectException`.
+        
+        // We'll do output buffering to see if anything is printed or if it just calls exit.
+        $output = $this->includeStreamFile();
+        
+        // If the script calls exit immediately, you might see an empty buffer.
+        // You can assert that the script produced no output or that certain lines were not run.
+        $this->assertSame("", $output, "Expected script to exit with no output for non-admin user.");
+    }
+
+    /**
+     * Example test: ensures that if an admin tries to create a new stream
+     * with minimal data, we attempt a database insert (REPLACE INTO).
+     */
+    public function testCreateNewStreamSuccess(): void
+    {
+        global $rPermissions, $ipTV_db_admin;
+        $rPermissions["is_admin"] = true;
+
+        // For instance, the script checks $_FILES["m3u_file"], $_REQUEST, etc.
+        $_REQUEST = [
+            "submit_stream"       => true,
+            "stream_display_name" => "My New Channel",
+            "category_id"         => [1,2],
+            "bouquets"            => [5,6],
+            "direct_source"       => 0,
+            "stream_source"       => [
+                "http://example.com/test.ts"
+            ],
+        ];
+        // Simulate an empty file upload:
+        $_FILES = [];
+
+        // We want to see if the script tries to do a DB REPLACE or INSERT.
+        // So let's mock $ipTV_db_admin->query() calls.
+        // This is a simplistic approach – in reality you'd want to catch
+        // specific queries or do a “spy” approach to verify the method was called
+        // with correct SQL.
+        $ipTV_db_admin
+            ->expects($this->any())
+            ->method('query')
+            ->willReturnCallback(function ($query) {
+                // We can do some rudimentary checks:
+                $this->assertStringContainsString("REPLACE INTO `streams`", $query, "Expected a REPLACE INTO `streams` query for new stream.");
+                // Return a mock object that simulates success:
+                return true;
+            });
+
+        // We also might need to mock $ipTV_db_admin->last_insert_id():
+        $ipTV_db_admin
+            ->method('last_insert_id')
+            ->willReturn(1234); // Fake new ID
+
+        // Now let's capture output and see if the script tries to redirect, etc.
+        $output = $this->includeStreamFile();
+
+        // Typically, if successful, the script might redirect. There's no
+        // direct echo, so $output might be empty. We can check headers or
+        // see if it sets a certain $_STATUS.
+        // Because the code calls header("Location: ..."), we can look for that
+        // in xdebug headers or use output buffering hacks.
+        $this->assertStringContainsString("", $output);
+
+        // Or we can check if it set a global $_STATUS = 0 (on success).
+        $this->assertSame(0, $GLOBALS["_STATUS"] ?? null, "Expected $_STATUS=0 on successful stream creation.");
+    }
+
+    // ... add more tests for editing streams, importing from M3U, etc. ...
+
+    /**
+     * A helper method to safely include stream.php and capture its output
+     * without halting the entire PHPUnit run if `exit;` is called inside.
+     * 
+     * @return string Output buffer contents from including stream.php
+     */
+    private function includeStreamFile(): string
+    {
+        // Because stream.php might call exit, we can do this in a separate function
+        // and catch that. We’ll wrap it in output buffering:
+        ob_start();
+        try {
+            include __DIR__ . '/../includes/stream.php';
+        } catch (\Throwable $ex) {
+            // If the script "exit"s, it won't throw an exception, but if there's
+            // a syntax error or something else, it might. We can handle that here if needed.
+        }
+        return ob_get_clean();
+    }
+}

@@ -2,6 +2,7 @@
 [![Main version](https://img.shields.io/github/v/release/Vateron-Media/Xtream_main?label=Main%20Release&color=green)](https://github.com/Vateron-Media/Xtream_main/)
 [![Sub version](https://img.shields.io/github/v/release/Vateron-Media/Xtream_lb?label=LB%20Release&color=blue)](https://github.com/Vateron-Media/Xtream_lb/)
 [![GitHub License](https://img.shields.io/github/license/Vateron-Media/Xtream_install)](LICENSE)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg)](CONTRIBUTORS.md)
 
 XtreamUI OpenSource is a **community-driven** project based on publicly available source code. This panel is designed to provide powerful media streaming solutions.
 
@@ -17,7 +18,7 @@ XtreamUI OpenSource is a **community-driven** project based on publicly availabl
 | Repository | Description |
 |------------|-------------|
 | [🔹 MAIN](https://github.com/Vateron-Media/Xtream_main) | XtreamUI Panel |
-| [🔸 SUB](https://github.com/Vateron-Media/Xtream_lb) | Balancer (Currently non-functional) |
+| [🔸 LB](https://github.com/Vateron-Media/Xtream_lb) | Balancer (Currently non-functional) |
 | [⚙ BUILD](https://github.com/Vateron-Media/Xtream_build) | Auxiliary files for building releases and other stuff |
 
 ---
@@ -42,6 +43,17 @@ cd Xtream_install/
 pip3 install -r requirements.txt
 sudo python3 install.py
 ```
+
+---
+
+## 🤝 Contributing
+We welcome contributions! Check out our [CONTRIBUTING.md](https://github.com/Vateron-Media/Xtream_main/blob/main/CONTRIBUTING.md) for details on how to get involved.
+
+You can also view the list of [contributors](https://github.com/Vateron-Media/Xtream_install/blob/main/CONTRIBUTORS.md).
+
+
+## 📜 License
+This project is licensed under the [AGPL-3.0 License](LICENSE).
 
 ---
 

@@ -16,6 +16,7 @@ if sys.version_info.major != 3:
     print("Please run with python3.")
     sys.exit(1)
 
+
 # -------------------------------------------------------------------------
 #  2) GitHub Release Helper
 # -------------------------------------------------------------------------
@@ -503,7 +504,7 @@ if __name__ == "__main__":
     printc("Configuring MySQL")
     rCreate = True
     if os.path.exists("/etc/mysql/my.cnf"):
-        if open("/etc/mysql/my.cnf", "r").read(5) == "# XC_V":
+        if open("/etc/mysql/my.cnf", "r").read(5) == "# XC_VM":
             rCreate = False
 
     if rCreate:
@@ -537,35 +538,35 @@ if __name__ == "__main__":
     )
 
     os.system(
-        f'sudo mysql -u root{rExtra} -e "CREATE USER \'{rUsername}\'@\'localhost\' IDENTIFIED BY \'{rPassword}\';"'
+        f"sudo mysql -u root{rExtra} -e \"CREATE USER '{rUsername}'@'localhost' IDENTIFIED BY '{rPassword}';\""
     )
     os.system(
-        f'sudo mysql -u root{rExtra} -e "GRANT ALL PRIVILEGES ON xc_vm.* TO \'{rUsername}\'@\'localhost\';"'
+        f"sudo mysql -u root{rExtra} -e \"GRANT ALL PRIVILEGES ON xc_vm.* TO '{rUsername}'@'localhost';\""
     )
     os.system(
-        f'sudo mysql -u root{rExtra} -e "GRANT ALL PRIVILEGES ON xc_vm_migrate.* TO \'{rUsername}\'@\'localhost\';"'
+        f"sudo mysql -u root{rExtra} -e \"GRANT ALL PRIVILEGES ON xc_vm_migrate.* TO '{rUsername}'@'localhost';\""
     )
     os.system(
-        f'sudo mysql -u root{rExtra} -e "GRANT ALL PRIVILEGES ON mysql.* TO \'{rUsername}\'@\'localhost\';"'
+        f"sudo mysql -u root{rExtra} -e \"GRANT ALL PRIVILEGES ON mysql.* TO '{rUsername}'@'localhost';\""
     )
     os.system(
-        f'sudo mysql -u root{rExtra} -e "GRANT GRANT OPTION ON xc_vm.* TO \'{rUsername}\'@\'localhost\';"'
+        f"sudo mysql -u root{rExtra} -e \"GRANT GRANT OPTION ON xc_vm.* TO '{rUsername}'@'localhost';\""
     )
 
     os.system(
-        f'sudo mysql -u root{rExtra} -e "CREATE USER \'{rUsername}\'@\'127.0.0.1\' IDENTIFIED BY \'{rPassword}\';"'
+        f"sudo mysql -u root{rExtra} -e \"CREATE USER '{rUsername}'@'127.0.0.1' IDENTIFIED BY '{rPassword}';\""
     )
     os.system(
-        f'sudo mysql -u root{rExtra} -e "GRANT ALL PRIVILEGES ON xc_vm.* TO \'{rUsername}\'@\'127.0.0.1\';"'
+        f"sudo mysql -u root{rExtra} -e \"GRANT ALL PRIVILEGES ON xc_vm.* TO '{rUsername}'@'127.0.0.1';\""
     )
     os.system(
-        f'sudo mysql -u root{rExtra} -e "GRANT ALL PRIVILEGES ON xc_vm_migrate.* TO \'{rUsername}\'@\'127.0.0.1\';"'
+        f"sudo mysql -u root{rExtra} -e \"GRANT ALL PRIVILEGES ON xc_vm_migrate.* TO '{rUsername}'@'127.0.0.1';\""
     )
     os.system(
-        f'sudo mysql -u root{rExtra} -e "GRANT ALL PRIVILEGES ON mysql.* TO \'{rUsername}\'@\'127.0.0.1\';"'
+        f"sudo mysql -u root{rExtra} -e \"GRANT ALL PRIVILEGES ON mysql.* TO '{rUsername}'@'127.0.0.1';\""
     )
     os.system(
-        f'sudo mysql -u root{rExtra} -e "GRANT GRANT OPTION ON xc_vm.* TO \'{rUsername}\'@\'127.0.0.1\';"'
+        f"sudo mysql -u root{rExtra} -e \"GRANT GRANT OPTION ON xc_vm.* TO '{rUsername}'@'127.0.0.1';\""
     )
 
     os.system(f'sudo mysql -u root{rExtra} -e "FLUSH PRIVILEGES;"')
@@ -597,7 +598,9 @@ if __name__ == "__main__":
         os.remove("/etc/systemd/system/xtreamcodes.service")
 
     if not os.path.exists("/etc/systemd/system/xtreamcodes.service"):
-        with io.open("/etc/systemd/system/xtreamcodes.service", "w", encoding="utf-8") as f:
+        with io.open(
+            "/etc/systemd/system/xtreamcodes.service", "w", encoding="utf-8"
+        ) as f:
             f.write(rSystemd)
         os.system("sudo chmod +x /etc/systemd/system/xtreamcodes.service")
         os.system("sudo systemctl daemon-reload")
@@ -635,7 +638,9 @@ if __name__ == "__main__":
     # 10.d) Increase systemd open-files limit
     systemd_sysconf = "/etc/systemd/system.conf"
     if "DefaultLimitNOFILE=655350" not in open(systemd_sysconf).read():
-        os.system('sudo echo "\nDefaultLimitNOFILE=655350" >> "/etc/systemd/system.conf"')
+        os.system(
+            'sudo echo "\nDefaultLimitNOFILE=655350" >> "/etc/systemd/system.conf"'
+        )
         os.system('sudo echo "\nDefaultLimitNOFILE=655350" >> "/etc/systemd/user.conf"')
 
     # 10.e) Redis config if not exists
@@ -648,38 +653,8 @@ if __name__ == "__main__":
     # 11) Final Steps
     # ---------------------------------------------------------------------
     os.system("sleep 2 && sudo mount -a  >/dev/null 2>&1")
-
-    # (A) Ensure /home/xtreamcodes/tmp/crons always exists with 0777
-    os.system("sudo mkdir -p /home/xtreamcodes/tmp/crons")
-
-    # (B) Fix ownership for /home/xtreamcodes/tmp
-    os.system("sudo chown -R xtreamcodes:xtreamcodes /home/xtreamcodes/tmp")
-
-    # (C) Also ensure that the entire /home/xtreamcodes is owned by xtreamcodes
-    os.system("sudo chown -R xtreamcodes:xtreamcodes /home/xtreamcodes")
-
-    # (D) Create a tmpfiles rule so crons directory is re-created on reboot with correct perms
-    tmpfiles_conf = "/etc/tmpfiles.d/xtreamcodes.conf"
-    if not os.path.exists(tmpfiles_conf):
-        # The 'd' type directive = create directory with given perms/owner
-        # Format: d path mode owner group age
-        os.system(
-            f'sudo bash -c "echo \'d /home/xtreamcodes/tmp/crons 0777 xtreamcodes xtreamcodes -\' > {tmpfiles_conf}"'
-        )
-    os.system("sudo systemd-tmpfiles --create")
-
-    # (E) Apply final permissions:
-    #     - 755 for directories (except tmp/ and content/streams)
-    #     - 644 for files
-    #     - 777 for tmp and /tmp/crons to allow writing/unlinking by PHP or other processes
-    os.system("sudo find /home/xtreamcodes/ -type d -exec chmod 755 {} +")
-    os.system("sudo find /home/xtreamcodes/ -type f -exec chmod 644 {} +")
-
-    # Make sure the essential “temp” directories are world-writable
-    os.system("sudo chmod 777 /home/xtreamcodes/tmp")
-    os.system("sudo chmod 777 /home/xtreamcodes/tmp/crons")
-    os.system("sudo chmod 777 /home/xtreamcodes/content/streams")
-
+    os.system("sudo chown xtreamcodes:xtreamcodes -R /home/xtreamcodes > /dev/null 2>&1")
+    
     # Reload systemd just in case
     os.system("sudo systemctl daemon-reload")
     os.system("sudo systemctl start xtreamcodes")

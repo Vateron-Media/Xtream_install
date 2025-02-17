@@ -569,6 +569,10 @@ if __name__ == "__main__":
         f"sudo mysql -u root{rExtra} -e \"GRANT GRANT OPTION ON xc_vm.* TO '{rUsername}'@'127.0.0.1';\""
     )
 
+    os.system(
+        f"sudo mysql -u root{rExtra} -e \"GRANT RELOAD ON *.* TO '{rUsername}'@'localhost';\""
+    )
+
     os.system(f'sudo mysql -u root{rExtra} -e "FLUSH PRIVILEGES;"')
 
     # 9.c) Write config.ini

@@ -197,7 +197,7 @@ password    =   "%s"
 """
 
 rSystemd = """[Unit]
-SourcePath=/home/xtreamcodes/service
+SourcePath=/home/xc_vm/service
 Description=XC_VM Service
 After=network.target
 StartLimitIntervalSec=0
@@ -207,9 +207,9 @@ Type=simple
 User=root
 Restart=always
 RestartSec=1
-ExecStart=/bin/bash /home/xtreamcodes/service start
-ExecReload=/bin/bash /home/xtreamcodes/service restart
-ExecStop=/bin/bash /home/xtreamcodes/service stop
+ExecStart=/bin/bash /home/xc_vm/service start
+ExecReload=/bin/bash /home/xc_vm/service restart
+ExecStop=/bin/bash /home/xc_vm/service stop
 
 [Install]
 WantedBy=multi-user.target
@@ -223,16 +223,16 @@ timeout 0
 tcp-keepalive 300
 daemonize yes
 supervised no
-pidfile /home/xtreamcodes/bin/redis/redis-server.pid
+pidfile /home/xc_vm/bin/redis/redis-server.pid
 loglevel warning
-logfile /home/xtreamcodes/bin/redis/redis-server.log
+logfile /home/xc_vm/bin/redis/redis-server.log
 databases 1
 always-show-logo yes
 stop-writes-on-bgsave-error no
 rdbcompression no
 rdbchecksum no
 dbfilename dump.rdb
-dir /home/xtreamcodes/bin/redis/
+dir /home/xc_vm/bin/redis/
 slave-serve-stale-data yes
 slave-read-only yes
 repl-diskless-sync no
@@ -410,9 +410,9 @@ if __name__ == "__main__":
     rPort = 7999
 
     # ---------------------------------------------------------------------
-    #  5) Check if /home/xtreamcodes/ exists
+    #  5) Check if /home/xc_vm/ exists
     # ---------------------------------------------------------------------
-    if os.path.exists("/home/xtreamcodes/"):
+    if os.path.exists("/home/xc_vm/"):
         printc("XC_VM Directory Exists!")
         while True:
             rAnswer = input("Continue and overwrite? (Y / N) : ")
@@ -470,28 +470,28 @@ if __name__ == "__main__":
     os.system("sudo ldconfig")
 
     # ---------------------------------------------------------------------
-    #  7) Create xtreamcodes user
+    #  7) Create xc_vm user
     # ---------------------------------------------------------------------
     try:
-        subprocess.check_output("getent passwd xtreamcodes".split())
+        subprocess.check_output("getent passwd xc_vm".split())
     except:
         printc("Creating user")
         os.system(
-            "sudo adduser --system --shell /bin/false --group --disabled-login xtreamcodes"
+            "sudo adduser --system --shell /bin/false --group --disabled-login xc_vm"
         )
 
-    if not os.path.exists("/home/xtreamcodes"):
-        os.mkdir("/home/xtreamcodes")
+    if not os.path.exists("/home/xc_vm"):
+        os.mkdir("/home/xc_vm")
 
     # ---------------------------------------------------------------------
     #  8) Download & Extract
     # ---------------------------------------------------------------------
     printc("Downloading Software")
-    os.system(f'wget -q -O "/tmp/xtreamcodes.tar.gz" "{ReleaseURL}"')
-    if os.path.exists("/tmp/xtreamcodes.tar.gz"):
+    os.system(f'wget -q -O "/tmp/xc_vm.tar.gz" "{ReleaseURL}"')
+    if os.path.exists("/tmp/xc_vm.tar.gz"):
         printc("Installing XC_VM")
-        os.system('sudo tar -zxvf "/tmp/xtreamcodes.tar.gz" -C "/home/xtreamcodes/"')
-        if not os.path.exists("/home/xtreamcodes/status"):
+        os.system('sudo tar -zxvf "/tmp/xc_vm.tar.gz" -C "/home/xc_vm/"')
+        if not os.path.exists("/home/xc_vm/status"):
             printc("Failed to extract! Exiting", col.FAIL)
             sys.exit(1)
     else:
@@ -534,7 +534,7 @@ if __name__ == "__main__":
     )
 
     os.system(
-        f'sudo mysql -u root{rExtra} xc_vm < "/home/xtreamcodes/bin/install/database.sql"'
+        f'sudo mysql -u root{rExtra} xc_vm < "/home/xc_vm/bin/install/database.sql"'
     )
 
     os.system(
@@ -577,7 +577,7 @@ if __name__ == "__main__":
 
     # 9.c) Write config.ini
     rConfigData = rConfig % (rUsername, rPassword)
-    with io.open("/home/xtreamcodes/config/config.ini", "w", encoding="utf-8") as f:
+    with io.open("/home/xc_vm/config/config.ini", "w", encoding="utf-8") as f:
         f.write(rConfigData)
 
     # ---------------------------------------------------------------------
@@ -586,29 +586,29 @@ if __name__ == "__main__":
     printc("Configuring System")
 
     # 10.a) FSTAB for ram-disks
-    if "/home/xtreamcodes/" not in open("/etc/fstab").read():
+    if "/home/xc_vm/" not in open("/etc/fstab").read():
         with io.open("/etc/fstab", "a", encoding="utf-8") as f:
             f.write(
-                "\ntmpfs /home/xtreamcodes/content/streams tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=90% 0 0"
+                "\ntmpfs /home/xc_vm/content/streams tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=90% 0 0"
             )
             f.write(
-                "\ntmpfs /home/xtreamcodes/tmp tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=6G 0 0"
+                "\ntmpfs /home/xc_vm/tmp tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=6G 0 0"
             )
 
     # 10.b) Systemd service file
-    if os.path.exists("/etc/init.d/xtreamcodes"):
-        os.remove("/etc/init.d/xtreamcodes")
-    if os.path.exists("/etc/systemd/system/xtreamcodes.service"):
-        os.remove("/etc/systemd/system/xtreamcodes.service")
+    if os.path.exists("/etc/init.d/xc_vm"):
+        os.remove("/etc/init.d/xc_vm")
+    if os.path.exists("/etc/systemd/system/xc_vm.service"):
+        os.remove("/etc/systemd/system/xc_vm.service")
 
-    if not os.path.exists("/etc/systemd/system/xtreamcodes.service"):
+    if not os.path.exists("/etc/systemd/system/xc_vm.service"):
         with io.open(
-            "/etc/systemd/system/xtreamcodes.service", "w", encoding="utf-8"
+            "/etc/systemd/system/xc_vm.service", "w", encoding="utf-8"
         ) as f:
             f.write(rSystemd)
-        os.system("sudo chmod +x /etc/systemd/system/xtreamcodes.service")
+        os.system("sudo chmod +x /etc/systemd/system/xc_vm.service")
         os.system("sudo systemctl daemon-reload")
-        os.system("sudo systemctl enable xtreamcodes")
+        os.system("sudo systemctl enable xc_vm")
 
     # 10.c) sysctl
     print(
@@ -631,13 +631,13 @@ if __name__ == "__main__":
             with io.open("/etc/sysctl.conf", "w", encoding="utf-8") as f:
                 f.write(rSysCtl)
             os.system("sudo sysctl -p >/dev/null 2>&1")
-            with open("/home/xtreamcodes/config/sysctl.on", "w") as f:
+            with open("/home/xc_vm/config/sysctl.on", "w") as f:
                 f.write("")
         except:
             print("Failed to write to sysctl file.")
     else:
-        if os.path.exists("/home/xtreamcodes/config/sysctl.on"):
-            os.remove("/home/xtreamcodes/config/sysctl.on")
+        if os.path.exists("/home/xc_vm/config/sysctl.on"):
+            os.remove("/home/xc_vm/config/sysctl.on")
 
     # 10.d) Increase systemd open-files limit
     systemd_sysconf = "/etc/systemd/system.conf"
@@ -648,7 +648,7 @@ if __name__ == "__main__":
         os.system('sudo echo "\nDefaultLimitNOFILE=655350" >> "/etc/systemd/user.conf"')
 
     # 10.e) Redis config if not exists
-    redis_conf = "/home/xtreamcodes/bin/redis/redis.conf"
+    redis_conf = "/home/xc_vm/bin/redis/redis.conf"
     if not os.path.exists(redis_conf):
         with io.open(redis_conf, "w", encoding="utf-8") as f:
             f.write(rRedisConfig)
@@ -658,20 +658,20 @@ if __name__ == "__main__":
     # ---------------------------------------------------------------------
     os.system("sleep 2 && sudo mount -a  >/dev/null 2>&1")
     os.system(
-        "sudo chown xtreamcodes:xtreamcodes -R /home/xtreamcodes > /dev/null 2>&1"
+        "sudo chown xc_vm:xc_vm -R /home/xc_vm > /dev/null 2>&1"
     )
 
     # Reload systemd just in case
     os.system("sudo systemctl daemon-reload")
-    os.system("sudo systemctl start xtreamcodes")
+    os.system("sudo systemctl start xc_vm")
 
     # Give it a moment to spin up
     time.sleep(10)
 
     # Start additional processes
-    os.system("sudo /home/xtreamcodes/status 1")
+    os.system("sudo /home/xc_vm/status 1")
     os.system(
-        "sudo /home/xtreamcodes/bin/php/bin/php /home/xtreamcodes/includes/cli_tool/startup.php >/dev/null 2>&1"
+        "sudo /home/xc_vm/bin/php/bin/php /home/xc_vm/includes/cli_tool/startup.php >/dev/null 2>&1"
     )
 
     # Save credentials for reference

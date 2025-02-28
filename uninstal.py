@@ -37,23 +37,23 @@ def remove_file(path):
 def stop_services():
     """Stop and disable the systemd service Xtream Codes"""
     printc("Stopping Xtream Codes services...", col.WARNING)
-    run_command("sudo systemctl stop xtreamcodes")
-    run_command("sudo systemctl disable xtreamcodes")
+    run_command("sudo systemctl stop xc_vm")
+    run_command("sudo systemctl disable xc_vm")
     run_command("sudo systemctl daemon-reload")
 
 
 def remove_systemd():
     """Delete the systemd unit file Xtream Codes"""
     printc("Deleting the systemd configuration...", col.WARNING)
-    remove_file("/etc/systemd/system/xtreamcodes.service")
+    remove_file("/etc/systemd/system/xc_vm.service")
     run_command("sudo systemctl daemon-reload")
 
 
 def remove_cronjobs():
     """Delete cron jobs related to Xtream Codes"""
     printc("Deleting cron tasks...", col.WARNING)
-    run_command("sudo crontab -u xtreamcodes -r")
-    run_command("sudo rm -f /etc/cron.d/xtreamcodes")
+    run_command("sudo crontab -u xc_vm -r")
+    run_command("sudo rm -f /etc/cron.d/xc_vm")
 
 
 def remove_fstab_entries():
@@ -65,7 +65,7 @@ def remove_fstab_entries():
             lines = fstab_file.readlines()
         with open(fstab_path, "w") as fstab_file:
             for line in lines:
-                if "xtreamcodes" not in line:
+                if "xc_vm" not in line:
                     fstab_file.write(line)
     run_command("sudo mount -a")
 
@@ -83,7 +83,7 @@ def remove_redis():
     printc("Deleting a Redis configuration...", col.WARNING)
     run_command("sudo systemctl stop redis-server")
     remove_file("/etc/systemd/system/redis.service")
-    remove_directory("/home/xtreamcodes/bin/redis")
+    remove_directory("/home/xc_vm/bin/redis")
 
 
 def remove_mysql():
@@ -92,8 +92,8 @@ def remove_mysql():
     mysql_commands = [
         "DROP DATABASE IF EXISTS xc_vm;",
         "DROP DATABASE IF EXISTS xc_vm_migrate;",
-        "DROP USER IF EXISTS 'xtreamcodes'@'localhost';",
-        "DROP USER IF EXISTS 'xtreamcodes'@'127.0.0.1';",
+        "DROP USER IF EXISTS 'xc_vm'@'localhost';",
+        "DROP USER IF EXISTS 'xc_vm'@'127.0.0.1';",
         "FLUSH PRIVILEGES;",
     ]
     for cmd in mysql_commands:
@@ -138,18 +138,18 @@ def remove_dependencies():
     run_command("sudo apt-get clean")
 
 
-def remove_xtreamcodes_files():
+def remove_xc_vm_files():
     """Delete Xtream Codes folders and files"""
-    remove_directory("/home/xtreamcodes")
-    remove_directory("/var/log/xtreamcodes")
-    remove_directory("/etc/nginx/sites-enabled/xtreamcodes.conf")
-    remove_file("/etc/systemd/system/xtreamcodes.service")
+    remove_directory("/home/xc_vm")
+    remove_directory("/var/log/xc_vm")
+    remove_directory("/etc/nginx/sites-enabled/xc_vm.conf")
+    remove_file("/etc/systemd/system/xc_vm.service")
 
 
 def remove_user():
     """Remove the Xtream Codes system user"""
-    printc("Deleting the xtreamcodes system user...", col.WARNING)
-    run_command("sudo userdel -r xtreamcodes")
+    printc("Deleting the xc_vm system user...", col.WARNING)
+    run_command("sudo userdel -r xc_vm")
 
 
 def final_cleanup():
@@ -171,7 +171,7 @@ if __name__ == "__main__":
     remove_iptables_rules()
     remove_redis()
     remove_mysql()
-    remove_xtreamcodes_files()
+    remove_xc_vm_files()
     remove_user()
     remove_dependencies()
     final_cleanup()

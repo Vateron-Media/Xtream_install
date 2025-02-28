@@ -452,7 +452,7 @@ if __name__ == "__main__":
         )
         os.system(
             f"sudo add-apt-repository -y 'deb [arch=amd64,arm64,ppc64el] "
-            f"http://ams2.mirrors.digitalocean.com/mariadb/repo/10.6/ubuntu {rVersions[rVersion]} main'"
+            f"http://ams2.mirrors.digitalocean.com/mariadb/repo/11.4/ubuntu {rVersions[rVersion]} main'"
         )
 
     os.system("sudo apt-get update")
@@ -657,8 +657,10 @@ if __name__ == "__main__":
     # 11) Final Steps
     # ---------------------------------------------------------------------
     os.system("sleep 2 && sudo mount -a  >/dev/null 2>&1")
-    os.system("sudo chown xtreamcodes:xtreamcodes -R /home/xtreamcodes > /dev/null 2>&1")
-    
+    os.system(
+        "sudo chown xtreamcodes:xtreamcodes -R /home/xtreamcodes > /dev/null 2>&1"
+    )
+
     # Reload systemd just in case
     os.system("sudo systemctl daemon-reload")
     os.system("sudo systemctl start xtreamcodes")

@@ -94,10 +94,23 @@ rPackages = [
     "iptables-persistent",
     "libjpeg-dev",
     "libpng-dev",
-    "php-ssh2",
     "xz-utils",
     "zip",
     "unzip",
+    "php8.4-fpm",
+    "php8.4-common",
+    "php8.4-opcache",
+    "php8.4-redis",
+    "php8.4-ssh2",
+    "php8.4-igbinary",
+    "php8.4-maxminddb",
+    "php8.4-curl",
+    "php8.4-gd",
+    "php8.4-mbstring",
+    "php8.4-mysqli",
+    "php8.4-ftp",
+    "php8.4-bcmath",
+    "php8.4-xml",
 ]
 
 rRemove = ["mysql-server"]
@@ -314,10 +327,8 @@ net.ipv6.route.flush = 1
 rVersions = {
     "18.04": "bionic",
     "20.04": "focal",
-    "20.10": "groovy",
-    "21.04": "hirsute",
-    "21.10": "impish",
-    # Add more if needed
+    "22.04": "jammy",
+    "24.04": "noble",
 }
 
 Choice = "23456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ"
@@ -391,9 +402,7 @@ if __name__ == "__main__":
     # ---------------------------------------------------------------------
     #  3) Insert libzip if Ubuntu 20.04 or 18.04
     # ---------------------------------------------------------------------
-    if rVersion == "20.04":
-        rPackages.append("libzip5")
-    elif rVersion == "18.04":
+    if rVersion == "18.04":
         rPackages.append("libzip4")
     else:
         rPackages.append("libzip5")
@@ -444,16 +453,16 @@ if __name__ == "__main__":
         "sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install software-properties-common"
     )
 
-    # 6.a) Add correct MariaDB repo
-    if rVersion in rVersions:
-        printc(f"Adding repo: Ubuntu {rVersion}")
-        os.system(
-            "sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8"
-        )
-        os.system(
-            f"sudo add-apt-repository -y 'deb [arch=amd64,arm64,ppc64el] "
-            f"http://ams2.mirrors.digitalocean.com/mariadb/repo/11.4/ubuntu {rVersions[rVersion]} main'"
-        )
+    # 6.a) Adding MariaDB and PHP repo
+    printc(f"Adding repo: Ubuntu {rVersion}")
+    os.system(
+        "sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8"
+    )
+    os.system(
+        f"sudo add-apt-repository -y 'deb [arch=amd64,arm64,ppc64el] "
+        f"http://ams2.mirrors.digitalocean.com/mariadb/repo/11.4/ubuntu {rVersions[rVersion]} main'"
+    )
+    os.system("sudo add-apt-repository ppa:ondrej/php -y")
 
     os.system("sudo apt-get update")
 
@@ -581,7 +590,36 @@ if __name__ == "__main__":
         f.write(rConfigData)
 
     # ---------------------------------------------------------------------
-    # 10) System Configurations
+    #  10) Configure PHP 8.4
+    # ---------------------------------------------------------------------
+
+    printc("Configuring PHP")
+    # replace configs
+    os.system('sudo cp -f "/home/xc_vm/bin/install/php/php.ini" "/etc/php/8.4/cli/php.ini"')
+
+    # clear path
+    os.system("sudo rm -r /etc/php/8.4/fpm/pool.d/*.conf")
+
+    # create 4 poolers for php-fpm
+    for i in range(1, 5):
+        # Reading the template
+        with open('/home/xc_vm/bin/install/php/fpm_pool_template', 'r') as f:
+            template = f.read()
+        
+        # Replacing placeholders
+        modified = template.replace('#ID#', str(i))
+        modified = modified.replace('#PATH#', '/home/xc_vm/')
+        
+        # Writing the config
+        config_path = f'/etc/php/8.4/fpm/pool.d/{i}.conf'
+        with open(config_path, 'w') as f:
+            f.write(modified)
+
+    # restrt php-fpm делаем в самом конце после всех манипуляций
+    os.system("sudo systemctl restart php8.4-fpm")
+
+    # ---------------------------------------------------------------------
+    # 11) System Configurations
     # ---------------------------------------------------------------------
     printc("Configuring System")
 
@@ -654,7 +692,7 @@ if __name__ == "__main__":
             f.write(rRedisConfig)
 
     # ---------------------------------------------------------------------
-    # 11) Final Steps
+    # 12) Final Steps
     # ---------------------------------------------------------------------
     os.system("sleep 2 && sudo mount -a  >/dev/null 2>&1")
     os.system(
@@ -671,7 +709,7 @@ if __name__ == "__main__":
     # Start additional processes
     os.system("sudo /home/xc_vm/status 1")
     os.system(
-        "sudo /home/xc_vm/bin/php/bin/php /home/xc_vm/includes/cli_tool/startup.php >/dev/null 2>&1"
+        "sudo /bin/php /home/xc_vm/includes/cli_tool/startup.php >/dev/null 2>&1"
     )
 
     # Save credentials for reference

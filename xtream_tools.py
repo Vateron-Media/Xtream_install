@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import subprocess
+import re
 
 
 def start_xc_vm():
@@ -44,6 +45,60 @@ def disable_xc_vm():
     print("xc_vm service disabled on boot.")
 
 
+def mariadb_memory_fix():
+    """Fix mariadb out of memory"""
+    try:
+        # Get total memory
+        with open("/proc/meminfo", "r") as f:
+            meminfo = f.read()
+
+        total_mem_kb = int(re.search(r"MemTotal:\s+(\d+) kB", meminfo).group(1))
+        total_mem_mb = total_mem_kb // 1024  # Convert to megabytes
+
+        # Calculate 70% of the available memory in MB
+        buffer_pool_mb = int(total_mem_mb * 0.7)
+
+        # Define the format of the value
+        if buffer_pool_mb >= 1024 and (buffer_pool_mb % 1024 == 0):
+            # If it is a multiple of 1024, we use gigabytes
+            buffer_size = f"{buffer_pool_mb // 1024}G"
+        else:
+            # In all other cases, megabytes
+            buffer_size = f"{buffer_pool_mb}M"
+
+        # Update config file
+        config_path = "/etc/mysql/my.cnf"
+
+        with open(config_path, "r") as f:
+            config = f.readlines()
+
+        updated = False
+        for i, line in enumerate(config):
+            if line.strip().startswith("innodb_buffer_pool_size"):
+                config[i] = f"innodb_buffer_pool_size = {buffer_size}\n"
+                updated = True
+                break
+
+        if not updated:
+            for i, line in enumerate(config):
+                if line.strip().startswith("[mysqld]"):
+                    config.insert(i + 1, f"innodb_buffer_pool_size = {buffer_size}\n")
+                    break
+
+        with open(config_path, "w") as f:
+            f.writelines(config)
+
+        print(f"Set: innodb_buffer_pool_size = {buffer_size}")
+        print("Restarting MariaDB")
+        subprocess.run(["sudo", "systemctl", "restart", "mariadb"])
+
+    except Exception as e:
+        print(f"Ошибка: {str(e)}")
+        exit(1)
+
+    print("mariadb out of memory fixed.")
+
+
 def print_menu():
     print("\n========   Welcome to   ========")
     print("\n======== XTREAM - TOOLS ========")
@@ -53,7 +108,8 @@ def print_menu():
     print("4) Status of xc_vm")
     print("5) Enable xc_vm (start on boot)")
     print("6) Disable xc_vm (disable on boot)")
-    print("7) Exit")
+    print("7) Fix mariadb out of memory")
+    print("8) Exit")
     print("==================================")
 
 
@@ -75,6 +131,8 @@ def main():
         elif choice == "6":
             disable_xc_vm()
         elif choice == "7":
+            mariadb_memory_fix()
+        elif choice == "8":
             print("Exiting XTREAM TOOLS.")
             break
         else:

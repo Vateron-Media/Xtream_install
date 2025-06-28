@@ -4,6 +4,8 @@
 [![GitHub License](https://img.shields.io/github/license/Vateron-Media/Xtream_install)](LICENSE)
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg)](CONTRIBUTORS.md)
 
+## The repository is archived due to the development of a new mod. All details can be found in the [TG group](https://t.me/+Z6pJHzrvrMEyMDYy)
+
 XtreamUI OpenSource is a **community-driven** project based on publicly available source code. This panel is designed to provide powerful media streaming solutions.
 
 ---
